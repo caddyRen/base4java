@@ -1,0 +1,66 @@
+plugins {
+    id 'java'
+}
+
+group 'indi.ikun'
+version '1.0-SNAPSHOT'
+
+//全局java版本
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+allprojects {
+    apply plugin: 'java'
+    /**
+     *    api() 方法需要引入java-library
+     *    api=compile 依赖可以传递 compile说是要抛弃
+     *    implementation 依赖不能传递给下一层
+     */
+    apply plugin: 'java-library'
+
+
+    compileTestJava.enabled = false
+    processTestResources.enabled = false
+    testClasses.enabled = false
+    test.enabled = false
+
+    //指定编码格式
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+    [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+    repositories {
+        //优先使用maven本地仓库
+        mavenLocal()
+        mavenCentral()
+    }
+}
+// 子项目的公共配置及插件
+subprojects {
+
+    dependencies {
+        api("org.projectlombok:lombok:1.16.22")
+        api("org.apache.commons:commons-lang3:3.8")
+        api("com.google.code.gson:gson:2.8.5")
+        api("com.google.guava:guava:29.0-jre")
+        // https://mvnrepository.com/artifact/cglib/cglib
+        api("cglib:cglib:3.3.0")
+
+        //lombok注解gradle识别不到
+        annotationProcessor "org.projectlombok:lombok:1.16.16"
+        testAnnotationProcessor "org.projectlombok:lombok:1.16.16"
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+    }
+
+}
+
+
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

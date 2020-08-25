@@ -1,0 +1,3 @@
+rootProject.name = 'base4java'
+include 'design_pattern'
+include 'base_java'

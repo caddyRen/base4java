@@ -3,7 +3,9 @@
 
 # Log file
 *.log
-
+.logs
+log
+logs
 # BlueJ files
 *.ctxt
 
@@ -21,3 +23,33 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
+.gradle
+!/.mvn/wrapper/maven-wrapper.jar
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**
+!**/src/test/**
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+class/
+out/
+
+### jrebel ###
+rebel.xml
+
+### VS Code ###
+.vscode/
