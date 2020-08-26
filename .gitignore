@@ -26,6 +26,7 @@ hs_err_pid*
 
 # Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
 .gradle
+build/
 !/.mvn/wrapper/maven-wrapper.jar
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**
