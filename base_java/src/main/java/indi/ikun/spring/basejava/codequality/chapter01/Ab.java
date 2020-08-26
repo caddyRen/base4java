@@ -11,7 +11,7 @@ import java.util.Random;
 public class Ab {
     public static void main(String[] args) {
         //1-常量会变306753251
-        System.out.println("1-常量会变"+Const.RAND_CONST);
+        System.err.println("1-常量会变"+Const.RAND_CONST);
     }
 }
 

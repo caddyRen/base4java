@@ -11,7 +11,8 @@ package indi.ikun.spring.basejava.codequality.chapter01;
 public class Aa {
     public static void main(String[] args) {
         long i=1l;
+        long i2=1L;
         //1-常量会变306753251
-        System.out.println(i+i);
+        System.err.println(i+i2);
     }
 }
