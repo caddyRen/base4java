@@ -1,91 +1,78 @@
 package indi.ikun.spring.basejava.io.chapter01;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.nio.CharBuffer;
 
 /**
+ * flip(),写后从头读，防止之前设置的position影响当前需要读取的位置
+ * clear()，重头开始写，防止之前设置的position，limit，影响当前的写入
  * @author renqiankun
  */
 public class Test7 {
     public static void main(String[] args) {
-        List<User> users = new ArrayList<>();
-        users.add(new User("tom", 188));
-        users.add(new User("jim", 288));
-        users.add(new User("mike", 688));
-        users.add(new User("mike2", 688));
-        users.add(new User("jimi", 888));
-        activity(users);
-    }
+        char[] chars=new char[]{'a','b','c'};
 
-    public static void activity(List<User> users) {
-        Scanner sc = new Scanner(System.in);
-        System.err.println("输入1显示用户，输入2开始抽奖，输入0结束活动");
-        boolean bool=true;
-        while (bool) {
-            switch (sc.nextInt()) {
-                case 1: {
-                    display(users);
-                    System.err.println("输入1显示用户，输入2开始抽奖，输入0结束活动");
-                    break;
-                }
-                case 2: {
-                    System.err.println("请输入幸运积分数");
-                    int luckyNum = sc.nextInt();
-                    getLucky(users, luckyNum);
-                    System.err.println("输入1显示用户，输入2开始抽奖，输入0结束活动");
-                    break;
-                }
-                case 0:{
-                    bool=false;
-                    break;
-                }
-                default:
-                    System.err.println("输入1显示用户，输入2开始抽奖，输入0结束活动");
-                    break;
-            }
-        }
-        sc.close();
-    }
+        CharBuffer charBuffer = CharBuffer.wrap(chars);
+        charBuffer.position(1);
+        charBuffer.mark();
+        charBuffer.put('s');
+        System.err.println(charBuffer.position());
+        System.err.println(charBuffer.get());//c,position=2
+        charBuffer.flip();
+        System.err.println(charBuffer.position());
+        System.err.println(charBuffer.get());//a,position=0
 
-    public static void display(List<User> users) {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < users.size(); i++) {
-            sb.append(users.get(i).toString());
-            sb.append(",");
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        System.err.println(sb.toString());
-    }
-
-    public static void getLucky(List<User> users, Integer luckyScore) {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < users.size(); i++) {
-            if (luckyScore.equals(users.get(i).score)) {
-                sb.append(users.get(i).name);
-                sb.append(",");
-            }
-        }
-        if (sb.length() > 0) {
-            sb.deleteCharAt(sb.length() - 1);
-        } else {
-            sb.append("NONE");
-        }
-        System.err.println(sb.toString());
+        CharBuffer charBuffer1 = CharBuffer.wrap(chars);
+        charBuffer1.position(1);
+        charBuffer1.put('s');//asc
+        Test3.display(charBuffer1);
+        charBuffer1.clear();
+        charBuffer1.put('z');//zsc::sc是原始数据，不会被清除
+        Test3.display(charBuffer1);
     }
 }
-
-class User {
-    String name;
-    Integer score;
-
-    public User(String name, Integer score) {
-        this.name = name;
-        this.score = score;
+//bug演示
+class Test7_1{
+    public static void main(String[] args) {
+        errorFlip();
+        okFlip();
+        errorClear();
+        okClear();
     }
 
-    @Override
-    public String toString() {
-        return name + ":" + score;
+    public static void errorFlip(){
+        char[] chars=new char[]{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s'};
+        CharBuffer charBuffer= CharBuffer.wrap(chars);
+        System.err.println(charBuffer.position());
+        charBuffer.put("我是中国人我在中华人民共和国");
+        //不用flip(),会多输出opqrs
+        Test3.display(charBuffer);
+    }
+    public static void okFlip(){
+        char[] chars=new char[]{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s'};
+        CharBuffer charBuffer= CharBuffer.wrap(chars);
+        System.err.println(charBuffer.position());
+        charBuffer.put("我是中国人我在中华人民共和国");
+        charBuffer.flip();
+        Test3.display(charBuffer);
+    }
+    public static void errorClear(){
+        char[] chars=new char[]{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s'};
+        CharBuffer charBuffer= CharBuffer.wrap(chars);
+        System.err.println(charBuffer.position());
+        charBuffer.put("我是中国人我在中华人民共和国");
+        //重新写入
+        charBuffer.put("他是美国人");
+        //不clear，
+        Test3.display(charBuffer);
+    }
+    public static void okClear(){
+        char[] chars=new char[]{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s'};
+        CharBuffer charBuffer= CharBuffer.wrap(chars);
+        System.err.println(charBuffer.position());
+        charBuffer.put("我是中国人我在中华人民共和国");
+        charBuffer.clear();
+        charBuffer.put("他是美国人");
+        charBuffer.flip();
+        Test3.display(charBuffer);
     }
 }

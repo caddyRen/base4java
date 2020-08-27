@@ -100,6 +100,33 @@ Buffer类是一个抽象类，它具有7个直接子类，
         直接缓冲区直接在内核空间中就进行了处理，无须JVM创建新的缓冲区，
         这样就减少了在JVM中创建中间缓冲区的步骤，增加了程序运行效率
         ```
+    - clear():作用是防止读写缓冲区时越界。还原缓冲区到初始状态，源码如下
+        ```text
+        public final Buffer clear() {
+                position = 0;
+                limit = capacity;
+                mark = -1;
+                return this;
+        }   
+        ```
+       - 主要使用场景，放在准备往缓冲区写入内容之前调用此方法，clear() 方法并不会清除缓冲区数据，只是还原position，limit，mark为初始值
+    - flip(): 作用是防止读写缓冲区时越界。反转此缓冲区。首先将限制设置为当前位置，然后将位置设置为0,mark设置为初始值（相当于移除标记mark）
+        ```text
+        public final Buffer flip() {
+                limit = position;
+                position = 0;
+                mark = -1;
+                return this;
+        }  
+        ```
+      - 使用场景：当向缓冲区中存储数据，然后再从缓冲区中读取数据。
+    - hasArray():判断此缓冲区是否具有可访问的底层实现数组,是否有char[],int[]等数组
+        ```text
+        public final boolean hasArray() {
+                return (hb != null) && !isReadOnly;
+        }
+        ```
+      
 ```text
 抽象类Buffer.java的7个子类也是抽象类，
 也就意味着ByteBuffer、CharBuffer、DoubleBuffer、FloatBuffer、IntBuffer、LongBuffer和ShortBuffer这些类也不能被直接new实例化
