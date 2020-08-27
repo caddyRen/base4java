@@ -1,84 +1,91 @@
 package indi.ikun.spring.basejava.io.chapter01;
 
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.InvalidMarkException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 /**
- * 1.缓冲区的capacity不能为负数，缓冲区的limit不能为负数，缓冲区的position不能为负数
- * 2.position不能大于其limit------看position(int newPosition)源码即可
- * 3.limit不能大于其capacity------看limit(int newLimit)源码即可
- * 4.如果定义了mark，则在将position或limit调整为小于该mark值时，该mark被丢弃
- * 5.如果未定义mark，那么调用reset()将抛出InvalidMarkException异常------reset()源码
- * 6.如果position大于新的limit则position的值就是新limit值------limit(int newLimit)源码
- * 7.当limit和position值一样时，在指定的position写入数据时会出现异常，因为此位置是被限制的
  * @author renqiankun
  */
 public class Test7 {
     public static void main(String[] args) {
-        test1();
-        System.err.println("####");
-        test4();
+        List<User> users = new ArrayList<>();
+        users.add(new User("tom", 188));
+        users.add(new User("jim", 288));
+        users.add(new User("mike", 688));
+        users.add(new User("mike2", 688));
+        users.add(new User("jimi", 888));
+        activity(users);
     }
 
-    /**
-     * 如果定义了mark，则在将position或limit调整为小于该mark值时，该mark被丢弃
-     */
-    private static void test4(){
-        char[] chars=new char[]{'a','b','c','d','e'};
-        CharBuffer charBuffer = CharBuffer.wrap(chars);
-        charBuffer.position(2);
-        charBuffer.mark();
-        charBuffer.position(1);
-        System.err.println("根据position(int newPosition)源码可只position小于mark，mark被设置为-1");
-        System.err.println("根据reset()源码可只当mark<0时，抛异常");
-        try{
-            charBuffer.reset();
-        }catch (InvalidMarkException e){
-            System.err.println("position调整为小于mark值时，mark被设置为-1，reset()方法异常");
+    public static void activity(List<User> users) {
+        Scanner sc = new Scanner(System.in);
+        System.err.println("输入1显示用户，输入2开始抽奖，输入0结束活动");
+        boolean bool=true;
+        while (bool) {
+            switch (sc.nextInt()) {
+                case 1: {
+                    display(users);
+                    System.err.println("输入1显示用户，输入2开始抽奖，输入0结束活动");
+                    break;
+                }
+                case 2: {
+                    System.err.println("请输入幸运积分数");
+                    int luckyNum = sc.nextInt();
+                    getLucky(users, luckyNum);
+                    System.err.println("输入1显示用户，输入2开始抽奖，输入0结束活动");
+                    break;
+                }
+                case 0:{
+                    bool=false;
+                    break;
+                }
+                default:
+                    System.err.println("输入1显示用户，输入2开始抽奖，输入0结束活动");
+                    break;
+            }
         }
-        System.err.println("#####");
-        CharBuffer charBuffer2 = CharBuffer.wrap(chars);
-        charBuffer2.position(2);
-        charBuffer2.mark();
-        charBuffer2.limit(1);
-        System.err.println("limit(int newLimit)源码可知limit小于mark，mark被设置为-1");
-        System.err.println("根据reset()源码可只当mark<0时，抛异常");
-        try{
-            charBuffer2.reset();
-        }catch (InvalidMarkException e){
-            System.err.println("limit调整为小于mark值时，mark被设置为-1，reset()方法异常");
-        }
-
-
+        sc.close();
     }
-    /**
-     * 缓冲区的capacity不能为负数，缓冲区的limit不能为负数，缓冲区的position不能为负数
-     * 看JDK源码即可
-     */
-    private static void test1(){
-        //public static ByteBuffer allocate(int capacity) {
-        //        if (capacity < 0)
-        //            throw new IllegalArgumentException();
-        //        return new HeapByteBuffer(capacity, capacity);
-        //    }
-        try{
-            ByteBuffer byteBuffer = ByteBuffer.allocate(-1);
-        }catch (IllegalArgumentException e){
-            System.err.println("缓冲区的capacity不能为负数");
-        }
 
-        char[] chars=new char[]{'a','b','c','d','e'};
-        CharBuffer charBuffer = CharBuffer.wrap(chars);
-        try{
-            CharBuffer limit =(CharBuffer)charBuffer.limit(-1);
-        }catch (IllegalArgumentException e){
-            System.err.println("缓冲区的limit不能为负数");
+    public static void display(List<User> users) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < users.size(); i++) {
+            sb.append(users.get(i).toString());
+            sb.append(",");
         }
-        try{
-            CharBuffer position =(CharBuffer)charBuffer.position(-1);
-        }catch (IllegalArgumentException e){
-            System.err.println("缓冲区的position不能为负数");
+        sb.deleteCharAt(sb.length() - 1);
+        System.err.println(sb.toString());
+    }
+
+    public static void getLucky(List<User> users, Integer luckyScore) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < users.size(); i++) {
+            if (luckyScore.equals(users.get(i).score)) {
+                sb.append(users.get(i).name);
+                sb.append(",");
+            }
         }
+        if (sb.length() > 0) {
+            sb.deleteCharAt(sb.length() - 1);
+        } else {
+            sb.append("NONE");
+        }
+        System.err.println(sb.toString());
+    }
+}
+
+class User {
+    String name;
+    Integer score;
+
+    public User(String name, Integer score) {
+        this.name = name;
+        this.score = score;
+    }
+
+    @Override
+    public String toString() {
+        return name + ":" + score;
     }
 }
