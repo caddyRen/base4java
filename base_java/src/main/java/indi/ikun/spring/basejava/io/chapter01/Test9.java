@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 /**
  * hasArray()
- * debug追踪
+ * debug追踪源码
  * @author renqiankun
  */
 public class Test9 {

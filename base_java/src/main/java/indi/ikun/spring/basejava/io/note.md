@@ -109,7 +109,7 @@ Buffer类是一个抽象类，它具有7个直接子类，
                 return this;
         }   
         ```
-       - 主要使用场景，放在准备往缓冲区写入内容之前调用此方法，clear() 方法并不会清除缓冲区数据，只是还原position，limit，mark为初始值
+       - 主要使用场景: 放在准备往缓冲区写入内容之前调用此方法，clear() 方法并不会清除缓冲区数据，只是还原position，limit，mark为初始值
     - flip(): 作用是防止读写缓冲区时越界。反转此缓冲区。首先将限制设置为当前位置，然后将位置设置为0,mark设置为初始值（相当于移除标记mark）
         ```text
         public final Buffer flip() {
@@ -119,13 +119,33 @@ Buffer类是一个抽象类，它具有7个直接子类，
                 return this;
         }  
         ```
-      - 使用场景：当向缓冲区中存储数据，然后再从缓冲区中读取数据。
+      - 使用场景: 当向缓冲区中存储数据，然后再从缓冲区中读取数据。
     - hasArray():判断此缓冲区是否具有可访问的底层实现数组,是否有char[],int[]等数组
         ```text
         public final boolean hasArray() {
                 return (hb != null) && !isReadOnly;
         }
         ```
+    - hasRemaining():判断当前位置和限制之间是否有元素
+    - remaining():返回当前位置与限制之间的元素个数
+        ```text
+        public final boolean hasRemaining() {
+                return position < limit;
+            }
+        public final int remaining() {
+                return limit - position;
+            }
+        ```
+        - 使用场景: 读写缓冲区时使用
+    - rewind():重绕缓冲区，将position设置为0 mark设置为-1,limit不变,
+        ```text
+         public final Buffer rewind() {
+                position = 0;
+                mark = -1;
+                return this;
+            }
+        ```
+        - 使用场景: 重新读取缓冲区中数据时使用
       
 ```text
 抽象类Buffer.java的7个子类也是抽象类，
