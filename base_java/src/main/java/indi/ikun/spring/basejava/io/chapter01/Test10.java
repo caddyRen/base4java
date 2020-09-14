@@ -29,5 +29,8 @@ public class Test10 {
         for(;byteBuffer.hasRemaining()==true;){
             System.err.print(byteBuffer.get()+"\t");
         }
+
+        //偏移量
+        System.out.println(byteBuffer.arrayOffset());
     }
 }

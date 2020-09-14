@@ -137,7 +137,7 @@ Buffer类是一个抽象类，它具有7个直接子类，
             }
         ```
         - 使用场景: 读写缓冲区时使用
-    - rewind():重绕缓冲区，将position设置为0 mark设置为-1,limit不变,
+    - rewind():重绕缓冲区，将position设置为0 mark设置为-1,limit不变,为重新读取缓冲区的数据做准备
         ```text
          public final Buffer rewind() {
                 position = 0;
@@ -146,7 +146,44 @@ Buffer类是一个抽象类，它具有7个直接子类，
             }
         ```
         - 使用场景: 重新读取缓冲区中数据时使用
-      
+    - arrayOffset():获取偏移量，返回缓冲区的底层实现数组中第一个缓冲区元素的偏移量，这个值在文档中标注为可选操作，也就是子类可以不处理这个值
+        ```text
+        public final int arrayOffset() {
+                if (hb == null)
+                    throw new UnsupportedOperationException();
+                if (isReadOnly)
+                    throw new ReadOnlyBufferException();
+                return offset;
+            }
+        ``` 
+- ByteBuffer类使用 : ByteBuffer类是Buffer的子类，可以在缓冲区中以字节为单位对数据进行存取
+    - 六类操作
+      ```
+      1. 以绝对位置和相对位置读写单个字节的get和put方法
+      2. 使用相对批量get(byte[] dst)方法可以将缓冲区中的连续字节传输到byte[] dst目标数组中
+      3. 使用相对批量put(byte[] src)方法可以将byte[]数组或其他字节缓冲区中的连续字节存储到此缓冲区中
+      4. 使用绝对和相对getType和putType方法可以按照字节顺序在字节序列中读写其他基本数据类型的值，方法getType和putType可以进行数据类型的自动转换
+      5. 提供了创建视图缓冲区的方法，这些方法允许将字节缓冲区视为包含其他基本类型的缓冲区，这些方法有asCharBuffer()、asDoubleBuffer()、asFloatBuffer()、asIntBuffer()、asLongBuffer()、asShortBuffer()
+      6. 提供对字节缓冲区进行压缩(compacting)、复制(duplicating)、截取(slicing)的方法
+      ```
+    - 字节缓冲区可以通过allocation()方法创建，此方法为缓冲区的内容分配空间，或者通过wrapping方法将现有的byte[]数组包装到缓冲区来创建
+    - 字节缓冲区
+        - 直接字节缓冲区
+        ```
+         JVM会尽量在直接字节缓冲区上执行本机IO操作，直接对内核空间进行访问，以提高运行效率。
+         提高运行效率的原理就是在每次调用基于操作系统的IO操作之前或之后，JVM都会尽量避免将缓冲区的内容复制到中间缓冲区，或者从中间缓冲区中复制内容
+         工厂方法allocateDirect()可以创建直接字节缓冲区，直接字节缓冲区进行内存的分配和释放所需的时间成本通常要高于非直接缓冲区
+         直接缓冲区操作的数据不再jvm堆中，而是在内核空间中。
+         直接缓冲区善于保存那些易受操作系统本机IO操作影响的大量、长时间保存的数据
+         allocateDirect(int capacity)方法作用:分配新的直接字节缓冲区。新缓冲区position=0,limit=capacity，mark=-1
+        ```
+        - 非直接字节缓冲区
+        ```
+         allocate(int capacity)方法作用:分配一个新的非直接字节缓冲区，新缓冲区position=0,limit=capacity，mark=-1,具有一个底层实现数组，数组偏移量offset=0
+         allocate会创建一个新的数组，而wrap方法是使用传入的数组作为存储空间，
+         说明对wrap关联的数组进行操作会影响到缓冲区中的数据，而操作缓冲区中的数据也会影响到与wrap关联的数组中的数据，因为引用同一个数组对象
+        ```
+     
 ```text
 抽象类Buffer.java的7个子类也是抽象类，
 也就意味着ByteBuffer、CharBuffer、DoubleBuffer、FloatBuffer、IntBuffer、LongBuffer和ShortBuffer这些类也不能被直接new实例化
