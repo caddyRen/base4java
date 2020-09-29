@@ -168,7 +168,7 @@ Buffer类是一个抽象类，它具有7个直接子类，
       ```
     - 字节缓冲区可以通过allocation()方法创建，此方法为缓冲区的内容分配空间，或者通过wrapping方法将现有的byte[]数组包装到缓冲区来创建
     - 字节缓冲区
-        - 直接字节缓冲区
+        - 直接字节缓冲区 实现类DirectByteBuffer
         ```
          JVM会尽量在直接字节缓冲区上执行本机IO操作，直接对内核空间进行访问，以提高运行效率。
          提高运行效率的原理就是在每次调用基于操作系统的IO操作之前或之后，JVM都会尽量避免将缓冲区的内容复制到中间缓冲区，或者从中间缓冲区中复制内容
@@ -177,11 +177,42 @@ Buffer类是一个抽象类，它具有7个直接子类，
          直接缓冲区善于保存那些易受操作系统本机IO操作影响的大量、长时间保存的数据
          allocateDirect(int capacity)方法作用:分配新的直接字节缓冲区。新缓冲区position=0,limit=capacity，mark=-1
         ```
-        - 非直接字节缓冲区
+        - 非直接字节缓冲区 实现类HeapByteBuffer
         ```
          allocate(int capacity)方法作用:分配一个新的非直接字节缓冲区，新缓冲区position=0,limit=capacity，mark=-1,具有一个底层实现数组，数组偏移量offset=0
          allocate会创建一个新的数组，而wrap方法是使用传入的数组作为存储空间，
          说明对wrap关联的数组进行操作会影响到缓冲区中的数据，而操作缓冲区中的数据也会影响到与wrap关联的数组中的数据，因为引用同一个数组对象
+        ```
+        - 注意
+        ```
+         allocateDirect()方法创建ByteBuffer，capacity指的是字节数
+         创建IntBuffer缓存区，capacity指的是int值的数目，如果要转换成字节，则capacity的值要乘4，计算出占用的总字节数 
+         释放allocateDirect()方法创建的直接缓冲区内存
+            1.手动释放内存
+            2.交给JVM进行处理
+        ```
+        - 效率
+        ```
+         直接缓冲区（DirectByteBuffer）在内部使用sun.misc.Unsafe类进行值的处理。Unsafe类的作用是JVM与操作系统进行直接通信，提高程序运行的效率，但正如其类的名称Unsafe一样，该类在使用上并不是安全的，如果程序员使用不当，那么极有可能出现处理数据上的错误，因此，该类并没有公开化（public），仅由JDK内部使用
+         非直接缓冲区（HeapByteBuffer）在内部直接对byte[] hb字节数组进行操作而且还是在JVM的堆中进行数据处理，因此运行效率相对慢一些
+        ```
+        - wrap数据处理
+        ```
+            wrap(byte[] array)方法将byte数组包装到缓冲区中，新的缓冲区将由给定的byte数组支持，缓冲区修改将导致数组修改，反之亦然.
+        新缓冲区的capacity和limit为arrays.length,position为0，mark为-1
+            wrap(byte[] array,int offset, int length)方法，将byte数组包装到缓冲区中，新的缓冲区将由给定的byte数组支持，缓冲区修改将导致数组修改，反之亦然。
+        新缓冲区的capacity为array.length,position=offset,limit=offset+length mark为-1.底层实现数组将为给定的数组，并且其arrayOffset将为0.
+        ```
+      - get/put
+        ```
+           相对位置操作 put(byte x)/get()：在读取写入一个或多个元素时，从当前位置开始，然后将位置增加所传输的元素数。
+        如果传输超出限制，则相对get操作将抛出BufferUnderflowException，相对put操作将抛出BufferOverflowException
+        执行相对位置，position会递增
+           绝对位置操作 put(int i, byte x)/get(int i): position不会变化
+           绝对位置批量put(byte[] src, int offset, int length)：将给的源数组中的字节传输到此缓冲区当前位置中position，
+           绝对位置批量get(byte[] src, int offset, int length)：将缓冲区当前位置字节传输到给定的目标数组中。
+           相对位置批量put(byte[] src)：put(byte[] src, 0, src.length)
+           相对位置批量get(byte[] src)：get(byte[] src, 0, src.length)
         ```
      
 ```text

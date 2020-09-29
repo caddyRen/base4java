@@ -18,6 +18,14 @@ public class Test1 {
         char[] chars=new char[]{'a','b','c','d'};
 
         ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+
+        ByteBuffer byteBuffer1 = ByteBuffer.wrap(bytes,1,2);
+        System.err.println(byteBuffer.capacity());
+        System.err.println(byteBuffer.limit());
+        System.err.println(byteBuffer.position());
+        System.err.println(byteBuffer1.capacity());
+        System.err.println(byteBuffer1.limit());
+        System.err.println(byteBuffer1.position());
         ShortBuffer shortBuffer = ShortBuffer.wrap(shorts);
         IntBuffer intBuffer = IntBuffer.wrap(ints);
         LongBuffer longBuffer = LongBuffer.wrap(longs);
