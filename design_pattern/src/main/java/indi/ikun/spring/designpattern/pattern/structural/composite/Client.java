@@ -1,7 +1,7 @@
 package indi.ikun.spring.designpattern.pattern.structural.composite;
 
 /**
- *
+ * 组合模式
  */
 public class Client {
 

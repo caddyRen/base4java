@@ -21,10 +21,12 @@ public class Decorator extends Drink {
         return super.getCost()+drink.cost();
     }
 
-    //递归调用
+    /**
+     * 递归调用
+     */
     @Override
     public String getDes() {
-        return super.des+" "+super.getCost()+" "+drink.getDes();
+        return super.getDes()+" "+super.getCost()+" "+drink.getDes();
     }
 }
 

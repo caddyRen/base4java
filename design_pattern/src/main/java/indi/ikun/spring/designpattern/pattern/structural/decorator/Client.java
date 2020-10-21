@@ -2,7 +2,6 @@ package indi.ikun.spring.designpattern.pattern.structural.decorator;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -45,23 +44,10 @@ public class Client {
          * DataInputStream  具体装饰者  Milk
          * FileInputStream  被装饰者
          */
-        DataInputStream dis=null;
-        try {
-            dis =new DataInputStream(new FileInputStream("/test.txt"));
+        try(DataInputStream dis=new DataInputStream(new FileInputStream("/test.txt"))) {
             System.err.println(dis.read());
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            if(dis!=null){
-                try {
-                    dis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 

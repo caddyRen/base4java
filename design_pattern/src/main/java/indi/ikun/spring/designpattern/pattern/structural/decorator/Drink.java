@@ -8,7 +8,7 @@ package indi.ikun.spring.designpattern.pattern.structural.decorator;
  */
 public abstract class Drink {
 
-    public String des;
+    private String des;
     private float cost;
 
     public void setDes(String des) {
