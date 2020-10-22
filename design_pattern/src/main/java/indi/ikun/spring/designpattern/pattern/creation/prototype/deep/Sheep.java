@@ -20,12 +20,12 @@ public class Sheep implements Cloneable, Serializable {
     public Object deepClone() {
         Sheep object = null;
         //创建流对象
-        try (
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();//序列化
-        ObjectOutputStream oos = new ObjectOutputStream(bos);//序列化
-        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());//反序列化
-        ObjectInputStream ois = new ObjectInputStream(bis)
-        ) {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();//序列化
+             ObjectOutputStream oos = new ObjectOutputStream(bos);//序列化
+             ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());//反序列化
+             ObjectInputStream ois = new ObjectInputStream(bis))
+        {
+
             //当前这个对象以对象流的方式输出
             oos.writeObject(this);
             object = (Sheep) ois.readObject();
