@@ -59,8 +59,6 @@ public class Sheep implements Cloneable, Serializable {
                 "name='" + name + '\'' +
                 ", color='" + color + '\'' +
                 ", age=" + age +
-//                ", sheep=" + sheep +
-                //浅拷贝内部类只是引用了地址
                 ", sheep hashcode= " + dog.hashCode() +
                 '}';
     }
