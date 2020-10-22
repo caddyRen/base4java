@@ -1,11 +1,16 @@
 package indi.ikun.spring.designpattern.pattern.behavior.mediator;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * 同事类
  */
+@Getter
+@Setter
 public abstract class Colleague {
-     private Mediator mediator;
-     public String name;
+    private Mediator mediator;
+    private String name;
 
     public Colleague(Mediator mediator, String name) {
         this.mediator = mediator;
@@ -15,7 +20,7 @@ public abstract class Colleague {
     public Mediator getMediator() {
         return mediator;
     }
-    public abstract void SendMessage(int stateChange);
+    public abstract void sendMessage(int stateChange);
 }
 
 
@@ -27,11 +32,11 @@ class Alarm extends Colleague{
     public Alarm(Mediator mediator, String name) {
         super(mediator, name);
         //创建Alarm对象时,将自己放入到ConcreteMediator对象中[集合]
-        mediator.Register(name,this);
+        mediator.register(name,this);
     }
 
-    public void SendAlarm(int stateChange){
-        SendMessage(stateChange);
+    public void sendAlarm(int stateChange){
+        sendMessage(stateChange);
     }
 
     /**
@@ -39,8 +44,8 @@ class Alarm extends Colleague{
      * @param stateChange
      */
     @Override
-    public void SendMessage(int stateChange) {
-        this.getMediator().GetMessage(stateChange,name);
+    public void sendMessage(int stateChange) {
+        this.getMediator().getMessage(stateChange,getName());
 
     }
 }
@@ -52,7 +57,7 @@ class TV extends Colleague{
     public TV(Mediator mediator, String name) {
         super(mediator, name);
         //创建Alarm对象时,将自己放入到ConcreteMediator对象中[集合]
-        mediator.Register(name,this);
+        mediator.register(name,this);
     }
 
     public void startTV(){
@@ -67,8 +72,8 @@ class TV extends Colleague{
      * @param stateChange
      */
     @Override
-    public void SendMessage(int stateChange) {
-        getMediator().GetMessage(stateChange,name);
+    public void sendMessage(int stateChange) {
+        getMediator().getMessage(stateChange,getName());
 
     }
 }
@@ -82,7 +87,7 @@ class Curtains extends Colleague{
     public Curtains(Mediator mediator, String name) {
         super(mediator, name);
         //创建Alarm对象时,将自己放入到ConcreteMediator对象中[集合]
-        mediator.Register(name,this);
+        mediator.register(name,this);
     }
 
     public void startCurtains(){
@@ -97,8 +102,8 @@ class Curtains extends Colleague{
      * @param stateChange
      */
     @Override
-    public void SendMessage(int stateChange) {
-        getMediator().GetMessage(stateChange,name);
+    public void sendMessage(int stateChange) {
+        getMediator().getMessage(stateChange,getName());
 
     }
 }
@@ -111,7 +116,7 @@ class CoffeeMachine extends Colleague{
     public CoffeeMachine(Mediator mediator, String name) {
         super(mediator, name);
         //创建Alarm对象时,将自己放入到ConcreteMediator对象中[集合]
-        mediator.Register(name,this);
+        mediator.register(name,this);
     }
 
     public void startCoffeeMachine(){
@@ -126,8 +131,8 @@ class CoffeeMachine extends Colleague{
      * @param stateChange
      */
     @Override
-    public void SendMessage(int stateChange) {
-        getMediator().GetMessage(stateChange,name);
+    public void sendMessage(int stateChange) {
+        getMediator().getMessage(stateChange,getName());
 
     }
 }

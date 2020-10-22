@@ -25,7 +25,7 @@ public class Strategy {
 
 
         Arrays.sort(data, (var1, var2) -> {
-            //将序
+            //降序
             if (var1.compareTo(var2) > 0) {
                 return -1;
             } else {

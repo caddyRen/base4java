@@ -23,10 +23,10 @@ public class Client {
         TV tv=new TV(mediator,"TV");
         CoffeeMachine coffeeMachine=new CoffeeMachine(mediator,"CoffeeMachine");
         Curtains curtains=new Curtains(mediator,"Curtains");
-        alarm.SendMessage(0);
-        tv.SendMessage(0);
-        coffeeMachine.SendMessage(1);
-        tv.SendMessage(1);
+        alarm.sendMessage(0);
+        tv.sendMessage(0);
+        coffeeMachine.sendMessage(1);
+        tv.sendMessage(1);
     }
 
 

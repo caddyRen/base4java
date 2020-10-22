@@ -93,12 +93,12 @@ class ObjectStructure {
 
    List<Element> elements=new ArrayList<>();
 
-   public void attach(Element visitor){
-       elements.add(visitor);
+   public void attach(Element element){
+       elements.add(element);
    }
 
-    public void detach(Element visitor){
-        elements.remove(visitor);
+    public void detach(Element element){
+        elements.remove(element);
    }
 
     public void display(Visitor visitor){

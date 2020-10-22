@@ -6,13 +6,13 @@ import java.util.Map;
 public abstract class Mediator {
 
     //将中介的对象放到集合里
-    public abstract void Register(String colleagueName, Colleague colleague);
+    public abstract void register(String colleagueName, Colleague colleague);
 
     //接收由具体的同事对象发出的消息
-    public abstract void GetMessage(int stateChange, String colleagueName);
+    public abstract void getMessage(int stateChange, String colleagueName);
 
     //自己也可以发消息
-    public abstract void SendMesage();
+    public abstract void sendMesage();
 
 }
 
@@ -20,7 +20,7 @@ public abstract class Mediator {
 class ConcreteMediator extends Mediator {
 
     private Map<String, Colleague> colleagueMap;
-    private Map<String, String> interMap;
+    private Map<String, String> interMap;//可以定义别名
 
     public ConcreteMediator() {
         colleagueMap = new HashMap<>();
@@ -28,7 +28,7 @@ class ConcreteMediator extends Mediator {
     }
 
     @Override
-    public void Register(String colleagueName, Colleague colleague) {
+    public void register(String colleagueName, Colleague colleague) {
         colleagueMap.put(colleagueName, colleague);
         if(colleague instanceof Alarm){
             interMap.put("Alarm",colleagueName);
@@ -50,7 +50,7 @@ class ConcreteMediator extends Mediator {
      * @param colleagueName
      */
     @Override
-    public void GetMessage(int stateChange, String colleagueName) {
+    public void getMessage(int stateChange, String colleagueName) {
         if (colleagueMap.get(colleagueName) instanceof TV) {
             if(stateChange==0){
                 ((Curtains)colleagueMap.get(interMap.get("Curtains"))).stopCurtains();
@@ -83,7 +83,7 @@ class ConcreteMediator extends Mediator {
      * 自己也可以发消息
      */
     @Override
-    public void SendMesage() {
-
+    public void sendMesage() {
+        throw new UnsupportedOperationException();
     }
 }
