@@ -3,62 +3,47 @@ package indi.ikun.spring.designpattern.pattern.creation.prototype.deep;
 import java.io.*;
 
 /**
+ * //反序列化 * @version 1.0
+ *
  * @Description: 深拷贝
  * @Author caddy
  * @date 2020-02-11 14:07:57
- * @version 1.0
  */
-public class Sheep implements Cloneable , Serializable {
-    private static final long serailVersionUID=1L;
+public class Sheep implements Cloneable, Serializable {
+    private static final long serailVersionUID = 1L;
     String name;
     String color;
     int age;
     Dog dog;
-    //深拷贝2 通过对象序列化 推荐使用
-    public Object deepClone(){
-        Sheep object=null;
 
+    //深拷贝2 通过对象序列化 推荐使用
+    public Object deepClone() {
+        Sheep object = null;
         //创建流对象
-        ByteArrayOutputStream bos=null;
-        ObjectOutputStream oos=null;
-        ByteArrayInputStream bis=null;
-        ObjectInputStream ois=null;
-        try{
-            //序列化
-            bos=new ByteArrayOutputStream();
-            oos=new ObjectOutputStream(bos);
+        try (
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();//序列化
+        ObjectOutputStream oos = new ObjectOutputStream(bos);//序列化
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());//反序列化
+        ObjectInputStream ois = new ObjectInputStream(bis)
+        ) {
             //当前这个对象以对象流的方式输出
             oos.writeObject(this);
-
-            //反序列化
-            bis=new ByteArrayInputStream(bos.toByteArray());
-            ois=new ObjectInputStream(bis);
-            object =(Sheep) ois.readObject();
-        }catch (Exception e){
+            object = (Sheep) ois.readObject();
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
-            try{
-                bos.close();
-                oos.close();
-                bis.close();
-                ois.close();
-            }catch (Exception e2){
-                e2.printStackTrace();
-            }
         }
         return object;
     }
 
 
-
     //深拷贝 重写clone方法
     @Override
     protected Object clone() throws CloneNotSupportedException {
-        Object object=null;
+        Object object;
         //浅拷贝
-        object=super.clone();
-        Sheep sheep=(Sheep)object;
-        sheep.dog= (Dog) dog.clone();
+        object = super.clone();
+        Sheep sheep = (Sheep) object;
+        sheep.dog = (Dog) dog.clone();
         return object;
     }
 
@@ -76,7 +61,7 @@ public class Sheep implements Cloneable , Serializable {
                 ", age=" + age +
 //                ", sheep=" + sheep +
                 //浅拷贝内部类只是引用了地址
-                ", sheep hashcode= "+dog.hashCode()+
+                ", sheep hashcode= " + dog.hashCode() +
                 '}';
     }
 
