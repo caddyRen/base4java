@@ -40,7 +40,6 @@ public class Sheep implements Cloneable {
                 "name='" + name + '\'' +
                 ", color='" + color + '\'' +
                 ", age=" + age +
-//                ", sheep=" + sheep +
                 //浅拷贝内部类只是引用了地址
                 ", sheep hashcode= "+sheep.hashCode()+
                 '}';
