@@ -1,4 +1,4 @@
-package indi.ikun.spring.designpattern.ppm;
+package indi.ikun.spring.designpattern.ppm.bo;
 
 import java.util.Date;
 
@@ -10,7 +10,7 @@ public class Creator {
     /**
      * 制单人
      */
-    private String creator;
+    private String createName;
     /**
      * 制单人id
      */

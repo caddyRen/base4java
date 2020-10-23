@@ -1,4 +1,4 @@
-package indi.ikun.spring.designpattern.ppm;
+package indi.ikun.spring.designpattern.ppm.bo;
 
 /**
  * 领料人
@@ -12,7 +12,7 @@ public class Receiver {
     /**
      * 领料人
      */
-    private String receiver;
+    private String receiveName;
     /**
      * 实际领料人身份证号
      */

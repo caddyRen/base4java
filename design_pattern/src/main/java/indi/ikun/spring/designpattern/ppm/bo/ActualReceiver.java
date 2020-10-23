@@ -1,4 +1,6 @@
-package indi.ikun.spring.designpattern.ppm;
+package indi.ikun.spring.designpattern.ppm.bo;
+
+import lombok.Getter;
 
 /**
  * 实际领料人
@@ -12,7 +14,7 @@ public class ActualReceiver {
     /**
      * 实际领料人
      */
-    private String actualReceiver;
+    private String actualReceiverName;
     /**
      * 实际领料人身份证号
      */

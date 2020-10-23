@@ -1,4 +1,4 @@
-package indi.ikun.spring.designpattern.ppm;
+package indi.ikun.spring.designpattern.ppm.bo;
 
 /**
  * 项目信息

@@ -1,10 +1,18 @@
-package indi.ikun.spring.designpattern.ppm;
+package indi.ikun.spring.designpattern.ppm.bo;
+
+import indi.ikun.spring.designpattern.ppm.flyweight.FlyWeight;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 物资详情
  * @author renqiankun
  */
-public class MaterialDetail extends MaterialBill {
+@Setter
+@Getter
+@ToString
+public class MaterialDetail implements FlyWeight {
 
     /**
      * 领料单物资详情id
@@ -55,16 +63,23 @@ public class MaterialDetail extends MaterialBill {
      */
     private String fromMovementItemId;
 
-
-
-/*************    以下是会变化的量
- * 使用享元模式共享状态
- *
- * ****************/
+    /**
+     * 领料单信息
+     */
+    private MaterialBill materialBill;
 
     /**
      * 物资状态
      */
-    MaterialState materialState;
+    private MaterialState materialState;
 
+
+    /**
+     * 将状态保存到共享数据内部
+     * @param materialState
+     */
+    @Override
+    public void use(MaterialState materialState) {
+        this.materialState=materialState;
+    }
 }
