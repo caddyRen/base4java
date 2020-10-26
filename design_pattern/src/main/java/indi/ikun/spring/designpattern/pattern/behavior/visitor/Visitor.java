@@ -55,7 +55,7 @@ abstract class Element {
 
 
 /**
- * 具体访问值,实现每个有Visitor声明的操作,是每个操作实现的部分
+ * 具体访问者,实现每个有Visitor声明的操作,是每个操作实现的部分
  *
  * 双分派---为了解耦
  * 首先在客户端程序,将  具体状态  作为参数传递到Woman中---第一次反派
@@ -87,7 +87,7 @@ class Woman extends Element {
 
 
 /**
- * 枚举它的元素,提供一个高层借口允许访问者访问元素
+ * 枚举它的元素,提供一个高层接口允许访问者访问元素
  */
 class ObjectStructure {
 
