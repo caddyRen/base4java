@@ -1,6 +1,6 @@
 package indi.ikun.spring.designpattern.ppm.visit.element;
 
-import indi.ikun.spring.designpattern.ppm.visit.IVisitor;
+import indi.ikun.spring.designpattern.ppm.visit.Visitor;
 import lombok.*;
 
 /**
@@ -19,8 +19,10 @@ public class MaterialAllocation  implements IElement{
      */
     private Integer state;
     @Override
-    public void accept(IVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.allocation(this);
     }
+
+
 
 }
