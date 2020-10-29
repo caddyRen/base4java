@@ -1,6 +1,6 @@
 package indi.ikun.spring.designpattern.ppm.visit.element;
 
-import indi.ikun.spring.designpattern.ppm.visit.Visitor;
+import indi.ikun.spring.designpattern.ppm.visit.IVisitor;
 import lombok.*;
 
 /**
@@ -19,7 +19,7 @@ public class MaterialClearing  implements IElement{
      */
     private Integer state;
     @Override
-    public void accept(Visitor visitor) {
+    public void accept(IVisitor visitor) {
         visitor.clearing(this);
     }
 

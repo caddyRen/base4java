@@ -5,7 +5,7 @@ import indi.ikun.spring.designpattern.ppm.visit.element.*;
 /**
  * @author renqiankun
  */
-public class VisitorClearing extends Visitor{
+public class VisitorClearing extends ParentVisitorContractor {
 
 
     @Override

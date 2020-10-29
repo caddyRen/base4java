@@ -5,7 +5,7 @@ import indi.ikun.spring.designpattern.ppm.visit.element.*;
 /**
  * @author renqiankun
  */
-public class VisitorConsume extends Visitor{
+public class VisitorConsume extends ParentVisitorContractor {
 
 
     @Override

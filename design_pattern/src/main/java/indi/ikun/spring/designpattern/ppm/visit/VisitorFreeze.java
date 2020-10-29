@@ -5,7 +5,7 @@ import indi.ikun.spring.designpattern.ppm.visit.element.*;
 /**
  * @author renqiankun
  */
-public class VisitorFreeze extends Visitor{
+public class VisitorFreeze extends ParentVisitorPartA {
 
     @Override
     public void freeze(MaterialFreeze materialFreeze) {
