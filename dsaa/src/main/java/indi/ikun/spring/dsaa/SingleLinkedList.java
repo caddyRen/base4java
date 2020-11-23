@@ -3,6 +3,8 @@ package indi.ikun.spring.dsaa;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.Stack;
+
 public class SingleLinkedList {
 
     public static void main(String[] args) {
@@ -10,6 +12,7 @@ public class SingleLinkedList {
         listDemo.show();
         listDemo.add(new HeroNode(2, "lin"));
         listDemo.add(new HeroNode(1, "song"));
+        listDemo.add(new HeroNode(3, "song"));
         listDemo.update(new HeroNode(1, "songjiang"));
         listDemo.update(new HeroNode(3, "songjiang"));
         listDemo.show();
@@ -37,6 +40,22 @@ public class SingleLinkedList {
         listDemo2.delete(new HeroNode(1, "songjiang"));
         listDemo2.show();
         System.err.println(listDemo2.getLength());
+
+        System.err.println("反转前");
+
+
+        SingleLinkedListDemo listDemo3 = new SingleLinkedListDemo();
+        listDemo3.add(new HeroNode(11, "lin"));
+        listDemo3.add(new HeroNode(22, "song"));
+        listDemo3.add(new HeroNode(33, "bbb"));
+        listDemo3.show();
+        System.err.println("反转后");
+        listDemo3.reversList();
+        listDemo3.show();
+        System.err.println("逆序打印");
+        listDemo3.stackShow();
+
+
     }
 }
 
@@ -55,6 +74,45 @@ class HeroNode {
 
 class SingleLinkedListDemo {
     private HeroNode head = new HeroNode(0, "");
+
+    /**
+     * 逆序打印-百度面试  利用栈
+     */
+    public void stackShow(){
+        if(head.next==null){
+            return;
+        }
+        Stack<HeroNode> stack=new Stack<>();
+        HeroNode cur = head.next;
+        while (cur!=null){
+            stack.add(cur);
+            cur=cur.next;
+        }
+        while (!stack.empty()){
+            System.err.println(stack.pop());
+        }   
+    }
+
+    /**
+     * 链表反转-头插法-腾讯面试
+     */
+    public void reversList(){
+        //空表，或只有一个节点
+        if(head.next==null||head.next.next==null){
+            return;
+        }
+        HeroNode cur = head.next;
+        HeroNode next=null;
+        HeroNode newHead = new HeroNode(0, "");
+
+        while (cur!=null){
+            next=cur.next;
+            cur.next=newHead.next;
+            newHead.next=cur;
+            cur=next;
+        }
+        head.next=newHead.next;
+    }
 
     /**
      * 查找单链表中倒数第k个节点-新浪面试题
