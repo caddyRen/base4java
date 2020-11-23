@@ -187,7 +187,7 @@ class SingleLinkedListDemo {
             System.err.println("空表");
             return;
         }
-        HeroNode temp = head;
+        HeroNode temp = head.next;
         boolean flag = false;
         while (true) {
             if (temp == null) {
