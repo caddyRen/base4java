@@ -34,7 +34,8 @@ public class QuickSort {
             while (arr[r] > pivot) {
                 r--;
             }
-            //数据换位置后，r会继续--
+            //数据换位置后，r，l还会继续移动，并不是一半一半，
+            //中值前和中值后，两部分，两部分不一定是一样多
             if (l >= r) {
                 break;
             }
@@ -50,8 +51,8 @@ public class QuickSort {
                 //arr[r]一定比pivot大，直接比较下一位
                 r--;
             }
-            System.err.println(Arrays.toString(arr));
         }
+        System.err.println(Arrays.toString(arr));
 
         if(l==r){
             l++;
