@@ -43,9 +43,9 @@ public class ShellSort {
                         j-=gap;
                     }
                     arr[j]=tmp;
+                    System.err.println(gap);
+                    System.err.println(Arrays.toString(arr));
                 }
-                System.err.println(gap);
-                System.err.println(Arrays.toString(arr));
             }
         }
 
