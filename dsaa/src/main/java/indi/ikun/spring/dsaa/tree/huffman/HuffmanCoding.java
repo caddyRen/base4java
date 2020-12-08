@@ -114,6 +114,10 @@ public class HuffmanCoding {
 
     /**
      * 压缩文件
+     * 注意事项：
+     *  如果文件本身就是经过压缩处理的，那么huffman编码再压缩效率不会有明显变化，比如视频，ppt等
+     *  huffman编码是按字节来处理的，因此可以处理所有的文件
+     *  如果一个文件中的内容重复数据不多，压缩效果也不明显
      *
      * @param srcFile 待压缩文件路径
      * @param dstFile 压缩后文件路径
