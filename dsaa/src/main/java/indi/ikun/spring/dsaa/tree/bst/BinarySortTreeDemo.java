@@ -34,6 +34,12 @@ public class BinarySortTreeDemo {
         tree.del(10);
         System.err.println("删除结点3和10");
         tree.midOrder();
+
+        tree.del(7);
+        tree.del(9);
+        tree.del(12);
+        tree.del(5);
+        tree.midOrder();
     }
 }
 
@@ -51,6 +57,7 @@ class BinarySortTree {
             }
             // 只有一个跟结点，且是目标结点，直接将root置空
             // 等价于没有父结点，不需要查找父结点，直接return
+            // 后面删除含有单结点的逻辑，还要考虑是否是root结点，88和99行
             if (root.left==null&&root.right==null){
                 root=null;
                 return;
@@ -78,18 +85,26 @@ class BinarySortTree {
             }else {
                 //有左子树
                 if(targetNode.left!=null){
-                    //判断要删除的是父结点的左子结点还是右子结点
-                    if(parent.left!=null&&parent.left.val==val){
-                        parent.left=targetNode.left;
-                    }else if(parent.right!=null&&parent.right.val==val){
-                        parent.right=targetNode.left;
+                    if(parent!=null){
+                        //判断要删除的是父结点的左子结点还是右子结点
+                        if(parent.left!=null&&parent.left.val==val){
+                            parent.left=targetNode.left;
+                        }else if(parent.right!=null&&parent.right.val==val){
+                            parent.right=targetNode.left;
+                        }
+                    }else {
+                        root=targetNode.left;
                     }
                 }else {
-                    //判断要删除的是父结点的左子结点还是右子结点
-                    if(parent.left!=null&&parent.left.val==val){
-                        parent.left=targetNode.right;
-                    }else if(parent.right!=null&&parent.right.val==val){
-                        parent.right=targetNode.right;
+                    if(parent!=null){
+                        //判断要删除的是父结点的左子结点还是右子结点
+                        if(parent.left!=null&&parent.left.val==val){
+                            parent.left=targetNode.right;
+                        }else if(parent.right!=null&&parent.right.val==val){
+                            parent.right=targetNode.right;
+                        }
+                    }else {
+                        root=targetNode.right;
                     }
                 }
             }
@@ -164,6 +179,8 @@ class BinarySortTree {
     public void midOrder() {
         if (root != null) {
             root.midOrder();
+        }else {
+            System.err.println("空树");
         }
     }
 
