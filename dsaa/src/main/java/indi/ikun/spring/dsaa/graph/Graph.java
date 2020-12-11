@@ -1,5 +1,6 @@
 package indi.ikun.spring.dsaa.graph;
 
+import javax.sql.CommonDataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +38,8 @@ import java.util.List;
  * A-B-E
  * A-C-B-E
  *
+
+ *
  */
 public class Graph {
     //顶点，此处使用字符串
@@ -45,6 +48,9 @@ public class Graph {
     private int [][] edges;
     //边总数
     private int numOfEdges;
+
+    //遍历，记录某个点是否被访问
+    private boolean isVisited[];
 
     public static void main(String[] args) {
         /**
@@ -83,6 +89,48 @@ public class Graph {
         System.err.println(graph.getVertexByIndex(3)+"到"+graph.getVertexByIndex(1)+"的权值是"+graph.getWeight(3,1));
         graph.display();
 
+        /**
+         * 图的遍历
+         * eg
+         *       A
+         *    /    \
+         *   B     C
+         *  /\    /\
+         * D  E  F  G
+         *  \/
+         *  H
+         */
+        System.err.println("图的遍历");
+        String[] vertexs2={"A","B","C","D","E","F","G","H"};
+        Graph graph2 = new Graph(8);
+        for (int i = 0; i < vertexs2.length; i++) {
+            graph2.insertVertex(vertexs2[i]);
+        }
+        //A-B
+        graph2.insertEdges(0,1,1);
+        //A-C
+        graph2.insertEdges(0,2,1);
+        //B-D
+        graph2.insertEdges(1,3,1);
+        //B-E
+        graph2.insertEdges(1,4,1);
+        //C-F
+        graph2.insertEdges(2,5,1);
+        //C-G
+        graph2.insertEdges(2,6,1);
+        //D-H
+        graph2.insertEdges(3,7,1);
+        //D-H
+        graph2.insertEdges(4,7,1);
+
+        System.err.println("一共有"+ graph2.getNumOfEdges()+"条边");
+        System.err.println("一共有"+ graph2.getVertexNum()+"个顶点");
+        System.err.println("3表示的数据是"+ graph2.getVertexByIndex(3));
+        System.err.println(graph2.getVertexByIndex(3)+"到"+graph2.getVertexByIndex(1)+"的权值是"+graph.getWeight(3,1));
+        graph2.display();
+        graph2.dfs();
+
+
     }
 
     /**
@@ -96,6 +144,7 @@ public class Graph {
         vertexList=new ArrayList<>();
         //边的数量初始化
         numOfEdges=0;
+        isVisited=new boolean[n];
     }
 
     /**
@@ -159,5 +208,80 @@ public class Graph {
             System.err.println(Arrays.toString(link));
         }
     }
+
+//深度遍历
+
+    /**
+     * 获取第一个邻接结点的下标
+     * 遍历当前行，找到下一个邻接结点
+     * @param index 矩阵某一行
+     * @return 第一个邻接结点的下标, 否则返回-1
+     */
+    public int getFistNeighbor(int index){
+        for (int i = 0; i < vertexList.size(); i++) {
+            //如果当前结点的下一个结点存在（值大于0）
+            if(edges[index][i]>0){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * 根据前一个邻接结点下标，获取下一个邻接结点
+     * 遍历v1行，从v2+1列开始
+     * @param v1 前一个邻接结点下标
+     * @param v2 前一个邻接结点下标
+     * @return
+     */
+    public int getNextNeighbor(int v1,int v2){
+        for (int i = v2+1; i < vertexList.size(); i++) {
+            if(edges[v1][i]>0){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
+    /**
+     * 深度优先:
+     * A->B->D->H->E
+     * ->C->F->G
+     *       A
+     *    /    \
+     *   B     C
+     *  /\    /\
+     * D  E  F  G
+     *  \/
+     *  H
+     * @param isVisited 记录是否被访问过
+     * @param i 开始结点
+     */
+    public void dfs(boolean[] isVisited,int i){
+        System.err.print(getVertexByIndex(i)+"->");
+        isVisited[i]=true;
+        int w = getFistNeighbor(i);
+        while (w!=-1){
+            if(!isVisited[w]){
+                dfs(isVisited,w);
+            }
+            System.err.print(getVertexByIndex(w)+">");
+            w=getNextNeighbor(i,w);
+
+        }
+
+    }
+
+    public void dfs(){
+        //回溯，每个结点都深度遍历一遍
+        for (int i = 0; i < getVertexNum(); i++) {
+            if(!isVisited[i]){
+                dfs(isVisited,i);
+            }
+        }
+    }
+
+
 
 }
