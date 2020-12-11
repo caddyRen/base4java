@@ -4,6 +4,8 @@ import javax.sql.CommonDataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * 图---多对多的关系
@@ -128,7 +130,8 @@ public class Graph {
         System.err.println("3表示的数据是"+ graph2.getVertexByIndex(3));
         System.err.println(graph2.getVertexByIndex(3)+"到"+graph2.getVertexByIndex(1)+"的权值是"+graph.getWeight(3,1));
         graph2.display();
-        graph2.dfs();
+//        graph2.dfs();
+        graph2.bsf();
 
 
     }
@@ -209,7 +212,8 @@ public class Graph {
         }
     }
 
-//深度遍历
+//深度遍历 DFS Depth first search
+//广度遍历 BFS Broad first search
 
     /**
      * 获取第一个邻接结点的下标
@@ -246,8 +250,20 @@ public class Graph {
 
     /**
      * 深度优先:
-     * A->B->D->H->E
-     * ->C->F->G
+     * 递归
+     * 从A开始遍历，先输出A，isVisited[]记录A已遍历过
+     * 然后找下一个相邻结点得B，然后输出B，isVisited[]记录B已遍历过
+     * 然后找B的下一个相邻结点得A
+     *      但是A已经遍历过（isVisited[]有记录），
+     *      再找B的下下个相邻结点，即继续遍历B行，得D
+     * 然后找D的下一个相邻结点，先得到已经输出过的B结点，再找的到H
+     * 找H的相邻结点，D已输出，所以得到E
+     * 找E的相邻结点B,H都输出过，然后回溯当前栈到D，再回溯到B,B会找到E已输出,B的相邻结点递归结束
+     * 继续回溯到A,找A的另一个相邻结点得C
+     *
+     * 至于重载bsf方法加了个循环，是因为图不一定是连续的，如没有A结点，图变成独立的两部分
+     *
+     * A->B->D->H->E->C->F->G
      *       A
      *    /    \
      *   B     C
@@ -266,15 +282,15 @@ public class Graph {
             if(!isVisited[w]){
                 dfs(isVisited,w);
             }
-            System.err.print(getVertexByIndex(w)+">");
             w=getNextNeighbor(i,w);
-
         }
-
     }
 
+    /**
+     * 重载
+     */
     public void dfs(){
-        //回溯，每个结点都深度遍历一遍
+        //回溯，每个结点都深度遍历一遍 可能整个图不是连续的
         for (int i = 0; i < getVertexNum(); i++) {
             if(!isVisited[i]){
                 dfs(isVisited,i);
@@ -282,6 +298,62 @@ public class Graph {
         }
     }
 
+
+    /**
+     * 广度优先 BroadFirstSearch
+     * 一层一层遍历
+     *
+     *       A
+     *    /    \
+     *   B     C
+     *  /\    /\
+     * D  E  F  G
+     *  \/
+     *  H
+     *  如从A开始，输出A并记录已访问
+     *  将A加入一个队列（先进先出）
+     *  队列非空继续执行，否则算法结束
+     *  出队列得A,找A的第一个邻接点，B记录已访问并将B入队
+     *          找A的第二个邻接点，C记录已访问并将C入队
+     *  出队得B,D入队，E入队
+     *  出队得C，F入队，G入队
+     *  出队得D,H入队
+     *  出队的E,出队的F,出队得G,出队得H
+     *  队列空算法结束
+     */
+    private void bsf(boolean[] isVisited,int i){
+        int u;//队列的头结点对应的下标
+        int w;//邻接点下标
+        Queue<Integer> queue = new ArrayBlockingQueue<>(getVertexNum()-1);
+        System.err.printf("%s=>",getVertexByIndex(i));
+        isVisited[i]=true;
+        queue.add(i);
+        while (!queue.isEmpty()){
+           u = queue.poll();
+           w=getFistNeighbor(u);
+           while (w!=-1){
+               if(!isVisited[w]){
+                   System.err.printf("%s=>",getVertexByIndex(w));
+                   isVisited[w]=true;
+                   queue.add(w);
+               }
+               //同层的下一个结点
+               w= getNextNeighbor(u, w);//广度
+
+           }
+        }
+    }
+
+    /**
+     * 重载用for包一下
+     */
+    public void bsf(){
+        for (int i = 0; i < vertexList.size(); i++) {
+            if(!isVisited[i]){
+                bsf(isVisited,i);
+            }
+        }
+    }
 
 
 }
