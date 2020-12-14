@@ -1,7 +1,6 @@
 package indi.ikun.spring.dsaa.sort;
 
 import java.util.Arrays;
-import java.util.Stack;
 
 /**
  * 归并排序 分治算法
@@ -45,7 +44,7 @@ public class MergeSort {
 
 
         //汉诺塔
-        int num=2;
+        int num=3;
         hanoiTower(num,'A','B','C');
     }
 
