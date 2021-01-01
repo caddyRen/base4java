@@ -4,12 +4,6 @@ public class Test {
     public static void main(String[] args) {
 
         System.out.println(17-16);
-
-
-
-//        System.out.println(15&1);
-//        System.out.println(8&1);
-//        System.out.println(getCandy(15,0));
         flag(13);
         flag(15);
         flag(17);
@@ -30,14 +24,6 @@ public class Test {
         //5   00101   -1   00110  00100  00001
         //3   00011   -1   00100  00010  00001
         //3   00011
-
-        //13-1 12/2 6/2 3-1 2/2
-
-        //15/2=7
-        //16 15       7 8
-
-        //15+1 16/2 8/2 4/2 2/2
-
     }
 
     public static boolean flag(int a){
