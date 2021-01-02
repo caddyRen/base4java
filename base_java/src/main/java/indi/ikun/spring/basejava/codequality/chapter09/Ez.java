@@ -85,8 +85,7 @@ public class Ez {
         end.await();
         int count=0;
         //统计总分
-        for (Future<Integer> f :
-                futures) {
+        for (Future<Integer> f : futures) {
             count+=f.get();
         }
         System.err.println("平均分数为： "+count/num);
