@@ -85,6 +85,8 @@ public class Ev {
             }
         });
         System.err.println(future.get());
+        //会等待线程任务执行完才关闭线程池
+        //Initiates an orderly shutdown in which previously submitted tasks are executed, but no new tasks will be accepted
         es1.shutdown();
         //newCachedThreadPool：缓冲功能的线程池
         ExecutorService es2=Executors.newCachedThreadPool();
@@ -92,6 +94,7 @@ public class Ev {
         Future<String> future22=es2.submit(() -> Thread.currentThread().getName()+"newCachedThreadPool：缓冲功能的线程池");
         System.err.println(future22.get());
         System.err.println(future2.get());
+        //会等待线程任务执行完才关闭线程池
         es2.shutdown();
 
         //newFixedThreadPool：固定线程数量的线程池
@@ -100,6 +103,7 @@ public class Ev {
         Future<String> future33=es3.submit(() -> Thread.currentThread().getName()+"newFixedThreadPool：固定线程数量的线程池");
         System.err.println(future3.get());
         System.err.println(future33.get());
+        //会等待线程任务执行完才关闭线程池
         es3.shutdown();
 
     }
