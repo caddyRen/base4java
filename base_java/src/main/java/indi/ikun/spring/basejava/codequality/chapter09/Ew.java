@@ -12,34 +12,34 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * 127.Lock与synchronized是不一样的
  * 显式锁（Lock类）和内部锁（synchronized关键字）不同
  * 1）Lock支持更细粒度的锁控制
- *      假设读写锁分离，写操作时不允许有读写操作存在，而读操作时读写可以并发执行，这一点内部锁就很难实现
+ * 假设读写锁分离，写操作时不允许有读写操作存在，而读操作时读写可以并发执行，这一点内部锁就很难实现
  * 2）Lock是无阻塞锁，synchronized是阻塞锁
- *      当线程A持有锁时，线程B也期望获得锁，
- *      此时，如果程序中使用的是显式锁，
- *          则B线程为等待状态（在通常的描述中，也认为此线程被阻塞了），
- *      若使用的是内部锁则为
- *          阻塞状态
+ * 当线程A持有锁时，线程B也期望获得锁，
+ * 此时，如果程序中使用的是显式锁，
+ * 则B线程为等待状态（在通常的描述中，也认为此线程被阻塞了），
+ * 若使用的是内部锁则为
+ * 阻塞状态
  * 3）Lock可实现公平锁，synchronized只能是非公平锁
- *      非公平锁：
- *          当一个线程A持有锁，而线程B、C处于阻塞（或等待）状态时，
- *          若线程A释放锁，JVM将从线程B、C中随机选择一个线程持有锁并使其获得执行权，
- *          这叫做非公平锁（因为它抛弃了先来后到的顺序）；
- *      公平锁：
- *          若JVM选择了等待时间最长的一个线程持有锁，则为公平锁（保证每个线程的等待时间均衡）。
- *      注意，
- *          即使是公平锁，JVM也无法准确做到“公平”，在程序中不能以此作为精确计算。
- *          显式锁默认是非公平锁，但可以在构造函数中加入参数true来声明出公平锁，
- *          而synchronized实现的是非公平锁，它不能实现公平锁
+ * 非公平锁：
+ * 当一个线程A持有锁，而线程B、C处于阻塞（或等待）状态时，
+ * 若线程A释放锁，JVM将从线程B、C中随机选择一个线程持有锁并使其获得执行权，
+ * 这叫做非公平锁（因为它抛弃了先来后到的顺序）；
+ * 公平锁：
+ * 若JVM选择了等待时间最长的一个线程持有锁，则为公平锁（保证每个线程的等待时间均衡）。
+ * 注意，
+ * 即使是公平锁，JVM也无法准确做到“公平”，在程序中不能以此作为精确计算。
+ * 显式锁默认是非公平锁，但可以在构造函数中加入参数true来声明出公平锁，
+ * 而synchronized实现的是非公平锁，它不能实现公平锁
  * 4）Lock是代码级的，synchronized是JVM级的
- *      Lock是通过编码实现的，
- *      synchronized是在运行期由JVM解释的，
- *      相对来说synchronized的优化可能性更高，毕竟是在最核心部分支持的，
- *      Lock的优化则需要用户自行考虑
+ * Lock是通过编码实现的，
+ * synchronized是在运行期由JVM解释的，
+ * 相对来说synchronized的优化可能性更高，毕竟是在最核心部分支持的，
+ * Lock的优化则需要用户自行考虑
  * 显式锁和内部锁的功能各不相同，在性能上也稍有差别，
  * 但随着JDK的不断推进，相对来说，显式锁使用起来更加便利和强大，
  * 在实际开发中选择哪种类型的锁就需要根据实际情况考虑了：
- *      灵活、强大则选择Lock，
- *      快捷、安全则选择synchronized
+ * 灵活、强大则选择Lock，
+ * 快捷、安全则选择synchronized
  */
 public class Ew {
     /**
@@ -97,8 +97,8 @@ class Ew1 {
         final Lock lock = new ReentrantLock();
         for (int i = 0; i < 3; i++) {
             new Thread(() -> {
+                lock.lock();
                 try {
-                    lock.lock();
                     Thread.sleep(2000);
                     System.err.println(Thread.currentThread().getName());
                 } catch (InterruptedException e) {
@@ -139,9 +139,9 @@ class TaskWithLock extends TaskEw implements Runnable {
     //确保即使出现运行期异常也能正常释放锁，保证其他线程能够顺利执行
     @Override
     public void run() {
+        //开始锁定
+        lock.lock();
         try {
-            //开始锁定
-            lock.lock();
             doSomething();
         } finally {
             //释放锁
@@ -163,52 +163,56 @@ class TaskWithSync extends TaskEw implements Runnable {
 
 /**
  * 读写锁分离
+ * 读读不互斥
+ * 写写，读写互斥
  */
-class FooEw{
+class FooEw {
     //可重入的读写锁
-    private final ReentrantReadWriteLock rwl=new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
     //读锁
-    private final Lock r=rwl.readLock();
+    private final Lock r = rwl.readLock();
     //写锁
-    private final Lock w=rwl.writeLock();
-    private int i=1;
+    private final Lock w = rwl.writeLock();
+    private int i = 1;
+
     //读操作，可并发执行
-    public void read(){
-        try{
-            r.lock();
+    public void read() {
+        r.lock();
+        try {
             Thread.sleep(1000);
-            System.err.println(Thread.currentThread().getName()+"read...= "+i);
-        }catch (InterruptedException e){
+            System.err.println(Thread.currentThread().getName() + "read...= " + i);
+        } catch (InterruptedException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             r.unlock();
         }
     }
+
     //写操作，同时只允许一个写操作
-    public void write(Object _obj){
-        try{
-            w.lock();
+    public void write(Object _obj) {
+        w.lock();
+        try {
             Thread.sleep(1000);
             i++;
-            System.err.println(Thread.currentThread().getName()+" writing...= "+i);
-        }catch (InterruptedException e){
+            System.err.println(Thread.currentThread().getName() + " writing...= " + i);
+        } catch (InterruptedException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             w.unlock();
         }
     }
 }
 
-class FooEwRun{
+class FooEwRun {
 
     public static void main(String[] args) {
-        FooEw fooEw=new FooEw();
+        FooEw fooEw = new FooEw();
         ExecutorService es = Executors.newCachedThreadPool();
         for (int i = 0; i < 6; i++) {
-            es.submit(()->{
+            es.submit(() -> {
                 fooEw.read();
             });
-            es.submit(()->{
+            es.submit(() -> {
                 fooEw.write(1);
             });
         }
