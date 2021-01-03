@@ -6,6 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Lock 同步锁
  * synchronized隐式锁
+ * @author renqiankun
  */
 public class TestLock {
 
