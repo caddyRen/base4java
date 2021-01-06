@@ -2,8 +2,8 @@ plugins {
     id 'java'
 }
 
-group 'indi.ikun'
-version '1.0-SNAPSHOT'
+group 'org.bougainvillea'
+version '1.0.0-SNAPSHOT'
 
 //全局java版本
 sourceCompatibility = '1.8'
