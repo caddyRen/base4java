@@ -6,7 +6,7 @@ public class SingletonDemo {
 
     public static void main(String[] args) {
         Long millisecond = Instant.now().toEpochMilli();
-        for(int i=0;i<2000;i++){
+        for(int i=0;i<12;i++){
             TestThread t=new TestThread();
             new Thread(t).start();
         }
@@ -25,7 +25,7 @@ class Demo{
 
     private Demo(){}
 
-    private static Demo instance;
+    private static volatile Demo instance;
 
     public static Demo getInstance() {
         if(instance==null){
@@ -43,7 +43,7 @@ class Demo{
 class TestThread implements Runnable{
     @Override
     public void run() {
-        Demo.getInstance().hashCode();
-//        System.err.println(Demo.getInstance().hashCode());
+//        Demo.getInstance().hashCode();
+        System.err.println(Demo.getInstance().hashCode());
     }
 }
