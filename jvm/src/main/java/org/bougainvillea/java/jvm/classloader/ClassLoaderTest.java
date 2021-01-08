@@ -1,5 +1,11 @@
 package org.bougainvillea.java.jvm.classloader;
 
+import com.sun.net.ssl.internal.ssl.Provider;
+import sun.misc.Launcher;
+import sun.security.ec.CurveDB;
+
+import java.net.URL;
+
 /**
  * 类加载器
  * 用户自定义类 默认使用AppClassLoader应用类加载器（系统类加载器）
@@ -33,6 +39,47 @@ public class ClassLoaderTest {
         //java核心类库都是使用 BootstrapClassloader引导类加载器进行加载
         ClassLoader classLoader1 = String.class.getClassLoader();
         System.out.println(classLoader1);
+
+
+        System.out.println("#############启动类加载器/引导类加载器########");
+        /**
+         * 获取BootstrapClassloader能够加载的api的路径
+         * 下面的jar都是由BootstrapClassloader加载
+         * file:/C:/Program%20Files/Java/jdk1.8.0_191/jre/lib/resources.jar
+         * file:/C:/Program%20Files/Java/jdk1.8.0_191/jre/lib/rt.jar
+         * file:/C:/Program%20Files/Java/jdk1.8.0_191/jre/lib/sunrsasign.jar
+         * file:/C:/Program%20Files/Java/jdk1.8.0_191/jre/lib/jsse.jar
+         * file:/C:/Program%20Files/Java/jdk1.8.0_191/jre/lib/jce.jar
+         * file:/C:/Program%20Files/Java/jdk1.8.0_191/jre/lib/charsets.jar
+         * file:/C:/Program%20Files/Java/jdk1.8.0_191/jre/lib/jfr.jar
+         * file:/C:/Program%20Files/Java/jdk1.8.0_191/jre/classes
+         */
+        URL[] urLs = Launcher.getBootstrapClassPath().getURLs();
+        for (URL url :
+                urLs) {
+            System.out.println(url.toExternalForm());
+        }
+        //file:/C:/Program%20Files/Java/jdk1.8.0_191/jre/lib/jsse.jar包内的Provider
+        //可以解压jar，找到Provider.class，确认有此类
+        ClassLoader classLoader2 = Provider.class.getClassLoader();
+        //null===>类加载器为BootstrapClassloader
+        System.out.println(classLoader2);
+        /**
+         * 下面目录内的jar包都由ExtClassloader加载
+         * C:\Program Files\Java\jdk1.8.0_191\jre\lib\ext
+         * C:\WINDOWS\Sun\Java\lib\ext
+         */
+        System.out.println("#########扩展类加载器###########");
+        String extDirs = System.getProperty("java.ext.dirs");
+        for (String path :
+                extDirs.split(";")) {
+            System.out.println(path);
+        }
+        //解压 C:\Program Files\Java\jdk1.8.0_191\jre\lib\ext\sunec.jar
+        // 从上面路径选择一个类，验证类加载器 sun.security.ec.CurveDB;
+        ClassLoader classLoader3 = CurveDB.class.getClassLoader();
+        //sun.misc.Launcher$ExtClassLoader@15db97
+        System.out.println(classLoader3);
 
     }
 }

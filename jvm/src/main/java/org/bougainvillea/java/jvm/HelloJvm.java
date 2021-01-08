@@ -25,6 +25,7 @@ public class HelloJvm {
     public static void main(String[] args) {
         System.out.println(a);
         System.out.println(b);
+        System.out.println(B.b1);
     }
 
     //Initialization阶段的<init>()对应构造器
@@ -32,4 +33,22 @@ public class HelloJvm {
         a=22;
         b=33;
     }
+
+    //父类<clinit>()执行完
+    static class A{
+        static int a1=10;
+        static {
+            a1=20;
+        }
+    }
+    //子类<clinit>()才能执行
+    //先获取父类a1
+    //0 getstatic #2 <org/bougainvillea/java/jvm/HelloJvm$B.a1>
+    //进行赋值
+    //3 putstatic #3 <org/bougainvillea/java/jvm/HelloJvm$B.b1>
+    static class B extends A{
+        static int b1=a1;
+    }
+
+
 }
