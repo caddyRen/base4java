@@ -1,4 +1,4 @@
-package org.bougainvillea.java.dsaa.dynamic;
+package org.bougainvillea.java.dsaa.algorithm;
 
 import java.util.Arrays;
 

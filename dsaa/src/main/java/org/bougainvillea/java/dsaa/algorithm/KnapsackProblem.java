@@ -1,4 +1,4 @@
-package org.bougainvillea.java.dsaa.dynamic;
+package org.bougainvillea.java.dsaa.algorithm;
 
 /**
  * 动态规划算法
