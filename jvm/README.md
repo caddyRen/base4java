@@ -13,9 +13,26 @@
 
 - Class Loader subSystem 类加载子系统
     - loading 加载
-        - Bootstrap ClassLoader c和c++实现的 引导 类加载器（Java核心类库默认使用）
+        - Bootstrap ClassLoader c和c++实现的 引导/启动 类加载器（Java核心类库默认使用）
+            1. 出于安全考虑Bootstrap只加载包名为java、javax、sun等开头的类
+            2. JAVA_HOME/jre/lib下的内容
+            3. sun.boot.class.path路径下的内容
+            4. 没有父加载器
+            5. 加载ExtensionClassloader和AppClassloader，并指定为他们的父类加载器
+            6. c/c++实现，嵌套在JVM内部
         - Extension ClassLoader java实现的 扩展 类加载器
+            1. 派生于ClassLoader类
+            2. 父类加载器为BootstrapClassloader
+            3. 从java.ext.dirs系统属性所指定的目录中加载类库
+            4. 从JDK的安装路径jre/lib/ext子目录下加载类库（如果用户创建的JAR放在此目录下也会自动由ExtensionClassLoader加载）
+            5. java语言编写
         - Application ClassLoader java实现的 系统 类加载器（自定义类型默认使用）
+            1. java语言编写由sun.misc.Launcher$AppClassLoader实现
+            2. 派生于ClassLoader
+            3. 父类加载器为ExtensionClassLoader
+            4. 加载环境变量classpath路径下的类库
+            5. 加载系统属性java.class.path指定路径下的类库
+            6. 
         - 自定义类加载器
     - Linking 链接
         - Verify 验证
@@ -149,4 +166,10 @@
     - 构造器是jvm视角下的<init>()
 - 若该类具有父类，jvm会保证 父类的<clinit>() 执行完毕后 子类的 <clinit>()执行
 - jvm必须保证一个类的<clinit>() 方法在多线程下被同步加锁
+### 双亲委派机制
+- 工作原理
+    1. 如果一个类加载器收到了类加载的请求，并不会先去加载，而是把这个请求委托给父类的加载器去执行
+    2. 如果父类加载器还存在其他父类加载器，则进一步向上委托，依次递归，请求最终将到达顶层的BootstrapClassloader
+    3. 如果父类加载器可以完成类加载任务，就成功加载返回如果父类加载器不能完成加载任务，子加载器才会尝试自己去加载
+    
     - 类只会被加载一次，并放置到method area（metadata）
