@@ -32,7 +32,6 @@
             3. 父类加载器为ExtensionClassLoader
             4. 加载环境变量classpath路径下的类库
             5. 加载系统属性java.class.path指定路径下的类库
-            6. 
         - 自定义类加载器
     - Linking 链接
         - Verify 验证
@@ -100,13 +99,13 @@
     - 加载扩展类和应用程序类加载器，并指定为他们的父类加载器
     - 处于安全考虑，Bootstrap启动类加载器只加载包名为java、javax、sun等开头的类
 - 自定义类加载器
-    - Extension Class Loader 
+    - Extension Class Loader
         - java语言编写由sun.misc.Launcher的静态内部类static class ExtClassLoader extends URLClassLoader实现
         - 派生于ClassLoader
         - 父类加载器为 Bootstrap Class Loader
         - 从java.ext.dirs系统属性所指定的目录中加载类库
         - 从JDK的安装目录jre/lib/ext子目录（扩展目录）下加载类库，如果用户创建的jar放在此目录下，也会自动由扩展类加载器加载
-    - System Class Loader 
+    - System Class Loader
         - java语言编写由sun.misc.Launcher的静态内部类static class AppClassLoader extends URLClassLoader实现
         - 派生于ClassLoader
         - 父类加载器为 Extension Class Loader
@@ -114,21 +113,25 @@
         - 程序中的默认类加载器，一般java应用的类都是由其来完成加载
         - 通过CLassLoader.getSystemClassLoader()可以获取到该类加载器
     - User Defined Class Loader
+
 #### 自定义类加载器
+
 - java日常应用程序开发中，类加载几乎是由上述3种类加载器相互配合执行的，在必要时，我们还可以自定义类的加载器，来定制类的加载方式
--  自定义类加载器功能
+- 自定义类加载器功能
     - 隔离加载类
         - 引入多个框架或中间件时，防止同名同路径的类冲突，进行仲裁，防止冲突
     - 修改类加载的方式
-        -  需要时加载 动态加载
+        - 需要时加载 动态加载
     - 扩展加载源
         - 字节码文件的来源方式，本地，网络，数据库等
     - 防止源码泄漏
         - 防止反编译，篡改对class文件加密
+
 1. 开发人员可以通过继承抽象类java.lang.Classloader类的方式实现自己的类加载器
 2. JDK1.2之前，在自定义类加载器时，总会去继承ClassLoader类并重写loadClass方法，来实现自定义的类加载器
 3. JDK1.2之后，不再建议用户去重写loadClass方法，建议把自定义的类加载逻辑协助findClass方法中
 4. 在编写自定义类加载器时，如果没有太过于复杂的需求，可以直接继承URLClassLoader类，这样就可以避免自己去编写findClass方法及其获取字节码流的方式，使自定义类加载器编写更简洁
+
 ### Linking
 
 #### Verify
@@ -166,10 +169,13 @@
     - 构造器是jvm视角下的<init>()
 - 若该类具有父类，jvm会保证 父类的<clinit>() 执行完毕后 子类的 <clinit>()执行
 - jvm必须保证一个类的<clinit>() 方法在多线程下被同步加锁
+    - 类只会被加载一次，并放置到method area（metadata）
+
 ### 双亲委派机制
+
 - 工作原理
     1. 如果一个类加载器收到了类加载的请求，并不会先去加载，而是把这个请求委托给父类的加载器去执行
     2. 如果父类加载器还存在其他父类加载器，则进一步向上委托，依次递归，请求最终将到达顶层的BootstrapClassloader
     3. 如果父类加载器可以完成类加载任务，就成功加载返回如果父类加载器不能完成加载任务，子加载器才会尝试自己去加载
     
-    - 类只会被加载一次，并放置到method area（metadata）
+
