@@ -71,10 +71,9 @@ public class ClassLoaderTest {
          */
         System.out.println("#########扩展类加载器###########");
         String extDirs = System.getProperty("java.ext.dirs");
-        for (String path :
-                extDirs.split(";")) {
-            System.out.println(path);
-        }
+//        for (String path : extDirs.split(";") ) {
+//            System.out.println(path);
+//        }
         //解压 C:\Program Files\Java\jdk1.8.0_191\jre\lib\ext\sunec.jar
         // 从上面路径选择一个类，验证类加载器 sun.security.ec.CurveDB;
         ClassLoader classLoader3 = CurveDB.class.getClassLoader();

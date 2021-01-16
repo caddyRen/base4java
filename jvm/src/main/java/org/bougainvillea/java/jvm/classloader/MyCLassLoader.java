@@ -35,7 +35,7 @@ public class MyCLassLoader extends ClassLoader {
      */
     private byte[] getClass(String name) throws FileNotFoundException {
 
-        return name.getBytes(StandardCharsets.UTF_8);
+        return null;
     }
 
     public static void main(String[] args) {
