@@ -40,17 +40,24 @@
         - Resolve 解析
     - Initialization 初始化
 - Runtime Data Areas 运行时数据区
-    - PC Registers 程序计数器 pc寄存器 每个线程一份
+    - ![image](img/runtime_data_area.png)
+    - 阿里巴巴![image](img/runtime_data_area_jdk8.png)
+    - Program Counter Register 程序计数器 pc寄存器 每个线程一份
     - Stack Area 虚拟机栈 每个线程一份
         - stack frame 栈帧
-        - LV 局部变量表
-        - OS 操作数栈
-        - DL 动态链接
-        - RA 方法返回地址
-    - Native Method Stack 本地方法栈
+        - local variables 局部变量表
+        - operand stack 操作数栈
+        - dynamic linking 动态链接
+        - return address 方法返回地址
+    - Native Method Stack 本地方法栈(调用c语言，与本地方法库、本地方法接口交互)
     - Heap Area 堆区 对象主体存放位置 GC主要管理的区域 多线程共享
-    - Method Area 方法区 类信息，常量，域信息，方法信息 多线程共享（HotSpot JVM有此区，JDK8叫元数据metadata）
-- Execution Engine 执行引擎
+    - Method Area 方法区 类信息，常量，域信息，方法信息 多线程共享(JVM规范)
+        - HotSpot 有Method Area
+            - JDK8 为元空间 metaspace
+            - jdk6&7 为永久代 PermGen space
+            - Method Area是JVM规范 metaspace、PermGen为method area的落地实现
+        - J9（IBM）和JRockit（Oracle）没有Method Area
+- Execution Engine 执行引擎![image](img/execution_engine.png)
     - Interpreter 解释器
     - JIT Compiler 即时编译器
         - Intermediate Code Generator 中间代码生成器
@@ -61,7 +68,7 @@
 - Native Method Interface（JNI） 本地方法接口
 - Native Method Library 本地方法库
 
-## Class Loader subSystem 类加载器子系统
+## Class Loader subSystem
 
 - 类加载器子系统负责从文件系统或者网络中加载class文件，class文件在文件开头有特定的文件标识
 - ClassLoader只负责class文件的加载，能否运行由Execution Engine决定
@@ -90,8 +97,9 @@
 - Bootstrap ClassLoader 引导类加载器，c和c++实现，嵌套再jvm内部
 - User-Defined ClassLoader 自定义加载器，java实现，派生于抽象类java.lang.ClassLoader
 
-#### 常见类加载器（不是上下层关系，也不是父子类的继承关系，是包含关系，a文件夹里有b和c，类似这种包含关系）
+#### 常见类加载器
 
+- 不是上下层关系，也不是父子类的继承关系，是包含关系，a文件夹里有b和c，类似这种包含关系
 - 引导类加载器
     - Bootstrap Class Loader c和c++实现
     - 嵌套再jvm内部
@@ -173,9 +181,10 @@
     - 类只会被加载一次，并放置到method area（metadata）
 
 ### 双亲委派机制
+
 - JVM对class文件采用的是按需加载的方式，当需要使用该类时才会将它的class文件加载到内存生产Class对象
 - JVM采用双亲委派机制，即把请求交给父类处理，一种任务委派模式![image](img/ClassLoader.png)
-- 加载jdbc.jar![image](img/ClassLoaderExample.png)  
+- 加载jdbc.jar ![image](img/ClassLoaderExample.png)
 - 工作原理
     1. 如果一个类加载器收到了类加载的请求，并不会先去加载，而是把这个请求委托给父类的加载器去执行
     2. 如果父类加载器还存在其他父类加载器，则进一步向上委托，依次递归，请求最终将到达顶层的BootstrapClassloader
@@ -184,12 +193,17 @@
     1. 避免类的重复加载
     2. 保护程序安全，防止核心API被随意篡改:
         - 自定义java.lang.String.main():Error: Main method not found in class java.lang.String
-        - 自定义类java.lang.MyBougainvillea:Exception in thread "main" java.lang.SecurityException: Prohibited package name: java.lang
+        - 自定义类java.lang.MyBougainvillea:Exception in thread "main" java.lang.SecurityException: Prohibited package name:
+          java.lang
+
 ### 沙箱安全机制
+
 - 自定义java.lang.String类，加载自定义String类的时候根据双亲委派原则会率先使用BootstrapClassLoader加载
 - 此时加载的是jdk自带的rt.jar包中java\lang\String.class 报错信息说没有main方法是因为rt.jar下的String类没有main方法
 - 这样保证对java核心源代码的保护这就是沙箱安全机制
+
 ### 类的主动使用和被动使用
+
 - 判断JVM中两个Class对象是否为同一个类
     1. 类的完整类名必须一致，包括包名
     2. 加载这个类的ClassLoader（指ClassLoader实例对象）必须相同
@@ -197,7 +211,11 @@
 - JVM必须知道一个类型是由启动类加载器加载还是由用户类加载器加载
 - 如果一个类型是由用户类加载器加载，那么JVM会将这个类加载器的一个引用作为类型信息的一部分保存在方法区中
 - （动态链接）当解析一个类型到另一个类型的引用的时候，JVM需要保证这两个类型的类加载器是相同的
-#### 主动使用（类会执行 Initialization 阶段）
+
+#### 主动使用
+
+- 类会执行 Initialization 阶段
+
 1. 创建类的实例
 2. 访问某一个类或接口的静态变量或者对静态变量赋值
 3. 调用类的静态方法
@@ -207,10 +225,106 @@
 7. JDK7开始提供的动态语言支持
     - java.lang.invoke.MethodHandle实例的解析结果
     - REF_getStatic、REF_putStatic、REF_invokeStatic句柄对应类没有初始化则初始化
-#### 被动使用（类不会执行 Initialization 阶段）
+
+#### 被动使用
+
+- 类不会执行 Initialization 阶段
 - 除了主动使用的七种情况，其他使用java类的方式都被看作是对类的被动使用，都不会导致类的初始化
 
+## runtime data area
 
+### 备注
+
+- 内存
+    ```text
+    是非常重要的系统资源，是硬盘和cpu的中间仓库及桥梁，承载着操作系统和应用程序的实时运行。
+    JVM内存布局规定了java在运行过程中内存申请、分配、管理的策略，保证了JVM的高效稳定运行。
+    不同的JVM对于内存的划分方式和管理机制存在着部分差异。
+    ```
+
+- JVM 定义了若干种程序运行期间会使用到的运行时数据区
+    - 一些随着JVM启动而创建，随着JVM退出而销毁
+        1. heap 堆内存
+        2. 堆外内存
+            1. method area「jdk8采用metaspace元空间/永久代，为method area的落地实现」
+            2. 代码缓存「JIT编译产物」
+    - 一些与线程一一对应，与线程对应的数据区会随着线程开始和结束而创建和销毁
+        1. program counter registers pc寄存器
+        2. stack 栈
+        3. native stack 本地方法栈
+- public class Runtime extends Object
+    ```text
+    每个JVM只有一个Runtime实例。即为运行时环境
+    Every Java application has a single instance of class Runtime that allows the application to interface with the
+    environment in which the application is running. The current runtime can be obtained from the getRuntime method.
+    ```
+
+### 线程
+
+- 线程是一个程序里的运行单元。JVM允许一个应用有多个线程并行的执行
+- HotspotJVM里，每个线程都与操作系统的本地线程直接映射
+    - 当一个java线程准备好执行以后，一个操作系统的本地线程也同时创建，java线程执行终止后本地线程也会回收
+    - 操作系统负责所有线程的安排调度到任何一个可用的cpu上，一旦本地线程初始化成功，会调用java线程中的run()方法
+    - 线程出现异常
+        - 捕获处理异常也相当于java线程正常终止
+        - 未捕获处理异常，java线程肯定终止，此时操作系统还要判断一下是否要终止JVM
+            - 守护线程 demon线程，如果JVM中只剩demon线程则JVM可以退出
+            - 非守护线程 当前线程为最后一个非守护线程则终止
+
+#### hotspotJVM的后台系统线程
+
+- 使用jconsole或者其他调试工具，能看到后台有许多线程在运行，不包括main方法的main线程以及所有这个main线程自己创建的线程
+
+1. 虚拟机线程
+
+    ```
+    这种线程的操作是需要JVM达到安全点才会出现。
+    这些操作必须在不同线程中发生的原因是他们都需要JVM达到安全点，这样heap才不会变化。
+    这种线程的执行类型包括“stop-the-world”的垃圾收集、线程栈收集、线程挂起、偏向锁撤销。
+    ```
+
+2. 周期任务线程
+    ```
+    这种线程是时间周期事件的体现（比如中断），他们一般用于周期性操作的调度执行
+    ```
+3. GC线程
+    ```
+    这种线程对在JVM里不同种类的垃圾收集行为提供了支持
+    ```
+4. 编译线程
+    ```
+    这种线程在运行时会将字节码编译成本地代码
+    ```
+5. 信号调度线程
+    ```
+    这种线程接收信号并发送给JVM,在它内部通过调用适当的方法进行处理
+    ```
+### Program Counter Register
+- The Java® Virtual Machine Specification Java SE 8 Edition
+    ```text
+    2.5.1 The pc Register
+    The Java Virtual Machine can support many threads of execution at once (JLS
+    §17). Each Java Virtual Machine thread has its own pc (program counter) register.
+    At any point, each Java Virtual Machine thread is executing the code of a single
+    method, namely the current method (§2.6) for that thread. If that method is not
+    native, the pc register contains the address of the Java Virtual Machine instruction
+    currently being executed. If the method currently being executed by the thread is
+    native, the value of the Java Virtual Machine's pc register is undefined. The Java
+    Virtual Machine's pc register is wide enough to hold a returnAddress or a native
+    pointer on the specific platform.
+    ```
+- 翻译为：PC寄存器、程序计数器、程序钩子
+- 并非是广义上的物理寄存器，PC寄存器是对物理PC寄存器的一种抽象模拟
+- CPU物理寄存器存储指令的现场信息，cpu只有把数据装载到寄存器才能够运行
+- 介绍
+    1. PC寄存器用来存储指向下一条指令的地址，也即是将要执行的指令代码。由Execution Engine读取下一条指令
+    2. 是一块很小的内存空间，几乎可以忽略不计，也是运行速度最快的存储区域
+    3. JVM规范中，每个线程都有它自己的程序计数器（记录线程执行到那个位置），是线程私有的，生命周期与线程的生命周期保持一致
+    4. 任何时间一个线程都只有一个方法在执行即当前方法，PC寄存器存储当前线程正在执行的java方法（方法有一系列指令）中的将要执行的jvm指令地址
+    5. 当执行本地方法native method（c语言的方法） PC寄存器则是指向undefined，此处涉及native method stack
+    6. 程序控制流的指示器，分支、循环、跳转、异常处理、线程恢复等基础功能都依赖PC寄存器
+    7. 字节码解释器工作时就是通过改变PC寄存器的值来选取下一条需要执行的字节码指令
+    8. 唯一一个在JVM规范中没有规定任何OutOfMemoryError情况的区域
 
 
 
