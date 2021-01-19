@@ -66,67 +66,90 @@
         - 正常函数返回使用return指令
         - 抛出异常（未用try-catch捕获处理）
     - stack frame包含
-        1. local variables 局部变量表      影响stack frame的大小
-        2. operand stack 操作数栈/表达式栈  影响stack frame的大小
+        1. local variables 局部变量表 影响stack frame的大小
+        2. operand stack 操作数栈/表达式栈 影响stack frame的大小
         3. dynamic linking（指向运行时常量池的方法引用）
         4. return address（方法正常退出或异常退出的定义）
         5. 附加信息
-    
-- local variables
-    - 局部变量表/局部变量数组/本地变量表
-    - 定义为一个数字数组主要用于存储方法参数和定义在方法体内的局部变量，数据类型包括8种基本数据类型，对象引用reference以及 return address数据类型
-         - slot数组，一个slot32位，long和double64位 占两个slot
-    - 局部变量表建立在线程上是线程的私有数据，因此不存在数据安全问题
-    - local variables所需的容量大小是在编译期确定下来的，并保存在方法的Code属性的maximum local variables数据项中，在方法运行期间是不会改变局部变量表的大小的
-    - 方法嵌套调用的次数由stack的大小决定
-        - stack越大，方法嵌套调用次数越多
-        - 对一个函数来说，参数和局部变量越多，local variables越大，则其stack frame越大，函数调用会占用更多的stack空间，导致嵌套调用次数减少
-        - local variables中的变量只在当前方法调用中有效
-            - 方法执行时，JVM通过使用local variables来完成参数值到参数变量列表的传递。
-            - 方法调用结束后，随着方法栈帧的销毁，local variables也会随之销毁
-    - 在stack frame中与性能调优有关的主要是local variables，
-    - local variables中的变量也是重要的垃圾回收根结点，只要被local variables中直接或间接引用的对象都不会被回收
-    - slot
-        - local variables的基本存储单元，
-        - 参数值的存放总是从local variables数组的index0开始，到数组.length-1索引结束
-        - local variables中存放编译期可知的8种基本数据类型，对象引用reference以及 return address数据类型
-        - 在local variables里32位以内的类型(byte、short、char存储前转换为int,boolean也转为int 0表示false，非0表示true)只占一个slot（包括returnAddress类型）
-        - 在local variables里64位的类型（long和double）占两个slot
-        - JVM会为局部变量表中的每一个slot分配一个访问索引，通过索引访问到local variables中指定的局部变量值
-            - long或double类型占两个slot,使用其占用的第一个slot的索引即可
-        - 当一个实例方法被调用时，方法参数和方法体内部定义的局部变量将会按照声明顺序被复制到local variables中的每一个slot
-          - 如果current frame是由构造方法或者实例方法创建的，那么该对象引用this将会存放在index为0的slot处，其余参数按照参数表顺序继续排列
-          - 静态方法内不存在对象引用this，其local variables内没有保存this,所以静态方法中不能使用this
-        - 如果一个局部变量过了其作用域，那么在其作用域之后申明的新的局部变量就很可能会复用过期局部变量的slot,从而达到节省资源的目的  
-        - 基本数据类型
-        
-        |类型|字节数(Byte)|位数(bit)|取值范围|
-        |:---:|:---:|:---:|:---:|
-        |byte|1|8|-2^7 ~ 2^7-1|
-        |short|2|16|-2^15 ~ 2^15-1|
-        |int|4|32|-2^31 ~ 2^31-1|
-        |long|8|64|-2^63 ~ 2^63-1|
-        |boolean|1|8|true和false|
-        |char|2|16|unicode编码，前128字节与ASCII兼容字符存储范围在 \u0000~\uFFFF|
-        |float|4|32|3.402823e+38 ~ 1.401298e-45（e+38表示是乘以10的38次方，同样，e-45表示乘以10的负45次方）|
-        |double|8|64|1.797693e+308~ 4.9000000e-324|
-    - 变量分类
-        - 按照数据类型分
-            - 基本数据类型
-            - 引用数据类型
-        - 按照类中声明位置分
-            - 成员变量: 使用前都经历过，默认初始化赋值
-                - 类变量（static修饰）：linking的prepare阶段会给类变量赋默认值---->Initialization阶段显示赋值(静态代码块赋值)
-                - 实例变量：随着对象的创建，会在heap空间中分配实例变量空间并进行默认赋值
-            - 局部变量：使用前必须显示赋值，否则编译不通过
 
-- operand stack 
-- dynamic linking
-- return address
-- 附加信息
-- 栈顶缓存技术
-- 方法调用
-- 面试相关
+## local variables
+
+- 局部变量表/局部变量数组/本地变量表
+- 定义为一个数字数组主要用于存储方法参数和定义在方法体内的局部变量，数据类型包括8种基本数据类型，对象引用reference以及 return address数据类型
+    - slot数组，一个slot32位，long和double64位 占两个slot
+- 局部变量表建立在线程上是线程的私有数据，因此不存在数据安全问题
+- local variables所需的容量大小是在编译期确定下来的，并保存在方法的Code属性的maximum local variables数据项中，在方法运行期间是不会改变局部变量表的大小的
+- 方法嵌套调用的次数由stack的大小决定
+    - stack越大，方法嵌套调用次数越多
+    - 对一个函数来说，参数和局部变量越多，local variables越大，则其stack frame越大，函数调用会占用更多的stack空间，导致嵌套调用次数减少
+    - local variables中的变量只在当前方法调用中有效
+        - 方法执行时，JVM通过使用local variables来完成参数值到参数变量列表的传递。
+        - 方法调用结束后，随着方法栈帧的销毁，local variables也会随之销毁
+- 在stack frame中与性能调优有关的主要是local variables，
+- local variables中的变量也是重要的垃圾回收根结点，只要被local variables中直接或间接引用的对象都不会被回收
+- slot
+    - local variables的基本存储单元，
+    - 参数值的存放总是从local variables数组的index0开始，到数组.length-1索引结束
+    - local variables中存放编译期可知的8种基本数据类型，对象引用reference以及 return address数据类型
+    - 在local variables里32位以内的类型(byte、short、char存储前转换为int,boolean也转为int 0表示false，非0表示true)只占一个slot（包括returnAddress类型）
+    - 在local variables里64位的类型（long和double）占两个slot
+    - JVM会为局部变量表中的每一个slot分配一个访问索引，通过索引访问到local variables中指定的局部变量值
+        - long或double类型占两个slot,使用其占用的第一个slot的索引即可
+    - 当一个实例方法被调用时，方法参数和方法体内部定义的局部变量将会按照声明顺序被复制到local variables中的每一个slot
+        - 如果current frame是由构造方法或者实例方法创建的，那么该对象引用this将会存放在index为0的slot处，其余参数按照参数表顺序继续排列
+        - 静态方法内不存在对象引用this，其local variables内没有保存this,所以静态方法中不能使用this
+    - 如果一个局部变量过了其作用域，那么在其作用域之后申明的新的局部变量就很可能会复用过期局部变量的slot,从而达到节省资源的目的
+    - 基本数据类型
+
+  |类型|字节数(Byte)|位数(bit)|取值范围|
+      |:---:|:---:|:---:|:---:|
+  |byte|1|8|-2^7 ~ 2^7-1|
+  |short|2|16|-2^15 ~ 2^15-1|
+  |int|4|32|-2^31 ~ 2^31-1|
+  |long|8|64|-2^63 ~ 2^63-1|
+  |boolean|1|8|true和false|
+  |char|2|16|unicode编码，前128字节与ASCII兼容字符存储范围在 \u0000~\uFFFF|
+  |float|4|32|3.402823e+38 ~ 1.401298e-45（e+38表示是乘以10的38次方，同样，e-45表示乘以10的负45次方）|
+  |double|8|64|1.797693e+308~ 4.9000000e-324|
+- 变量分类
+    - 按照数据类型分
+        - 基本数据类型
+        - 引用数据类型
+    - 按照类中声明位置分
+        - 成员变量: 使用前都经历过，默认初始化赋值
+            - 类变量（static修饰）：linking的prepare阶段会给类变量赋默认值---->Initialization阶段显示赋值(静态代码块赋值)
+            - 实例变量：随着对象的创建，会在heap空间中分配实例变量空间并进行默认赋值
+        - 局部变量：使用前必须显示赋值，否则编译不通过
+
+## operand stack
+
+- 概述
+    - 每一个独立的stack frame中除了包含局部变量表以外，还包含一个后进先出(Last-In-First-Out/先进后出First-In-Last-Out)的操作数栈operand stack(表达式栈Expression
+      stack)
+    - operand stack 在方法执行过程中，根据字节码指令，往栈中写入数据或提取数据，即入栈push或出栈pop
+    - 某些字节码指令将值压入operand stack，其余的字节码指令将操作数取出operand stack，使用（复制、交换、求和）后把结果压入operand stack
+    - 如果被调用的方法带有返回值，其返回值将会被压入当前stack frame的operand stack中，并更新ProgramCounterRegister中下一条需要执行的字节码指令
+    - operand stack中元素的数据类型必须与字节码指令的序列严格匹配，这由编译器在编译期间进行验证，同时在类加载过程中的类检验阶段的数据流分析阶段要再次验证
+    - JVM的解释引擎是基于operand stack的execution engine
+    - operand stack主要保存计算过程的中间结果，同时作为计算过程中变量临时的存储空间
+    - operand stack是JVM execution engine的一个工作区，当一个方法刚开始执行的时候，一个新的stack frame也会随之被创建，这个方法的operand stack是空的（已创建）
+    - 每一个operand stack 都会拥有一个明确的栈深度用于存储数值，其所需的最大深度在编译期就定义好了，保存在方法的Code属性中，为max_stack的值，与local variables大小
+    - operand stack中任何一个元素都是任意的Java数据类型，与local variables的slot类似
+        - 32bit的类型占用一个operand stack单位深度
+        - 64bit的类型占用两个operand stack单位深度
+    - 数组实现operand stack, 并非采用访问index的方式来进行数据访问，而是只能通过标准的入栈push和出栈pop操作来完成一次数据访问
+
+## dynamic linking
+
+## return address
+
+## 附加信息
+
+## 栈顶缓存技术
+
+## 方法调用
+
+## 面试相关
 
 
 

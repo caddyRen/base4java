@@ -13,7 +13,7 @@ public class OSTest {
          *   2 istore_1   出栈 Store 10 into local variable (数组，1位置，0位置为this)
          *   3 getstatic #5 <java/lang/System.out>
          *   6 iload_1    Load int from local variable into operand stack。10入栈(为了System.out.println才入栈的可以注释掉验证)
-         *   7 iinc 1 by 1  ++i  第一个1为local variable数组下标.第二个1为增加的值
+         *   7 iinc 1 by 1  ++i  第一个1为local variable数组下标.第二个1为增加的值 Increment local variable by constant 直接在local variables上操作
          *  10 invokevirtual #6 <java/io/PrintStream.println>   10 出栈
          */
         int i1=10;
@@ -24,7 +24,7 @@ public class OSTest {
          *  13 bipush 10
          *  15 istore_2
          *  16 getstatic #5 <java/lang/System.out>
-         *  19 iinc 2 by 1
+         *  19 iinc 2 by 1  Increment local variable by constant 直接在local variables上操作
          *  22 iload_2
          *  23 invokevirtual #6 <java/io/PrintStream.println>
          */
@@ -36,7 +36,7 @@ public class OSTest {
          *  26 bipush 10
          *  28 istore_3
          *  29 iload_3
-         *  30 iinc 3 by 1
+         *  30 iinc 3 by 1  Increment local variable by constant 直接在local variables上操作
          *  33 istore_3
          *  34 getstatic #5 <java/lang/System.out>
          *  37 iload_3
@@ -50,7 +50,7 @@ public class OSTest {
         /**
          * 41 bipush 10
          *  43 istore 4
-         *  45 iinc 4 by 1
+         *  45 iinc 4 by 1  Increment local variable by constant 直接在local variables上操作
          *  48 iload 4
          *  50 istore 4
          *  52 getstatic #5 <java/lang/System.out>
@@ -67,7 +67,7 @@ public class OSTest {
          * 60 bipush 10
          *  62 istore 5
          *  64 iload 5
-         *  66 iinc 5 by 1
+         *  66 iinc 5 by 1  Increment local variable by constant 直接在local variables上操作
          *  69 istore 6
          *  71 getstatic #5 <java/lang/System.out>
          *  74 iload 6
@@ -81,7 +81,7 @@ public class OSTest {
         /**
          * 79 bipush 10
          *  81 istore 7
-         *  83 iinc 7 by 1
+         *  83 iinc 7 by 1  Increment local variable by constant 直接在local variables上操作
          *  86 iload 7
          *  88 istore 8
          *  90 getstatic #5 <java/lang/System.out>
@@ -98,8 +98,8 @@ public class OSTest {
          *  98 bipush 10
          * 100 istore 9
          * 102 iload 9           10
-         * 104 iinc 9 by 1
-         * 107 iinc 9 by 1
+         * 104 iinc 9 by 1  Increment local variable by constant 直接在local variables上操作
+         * 107 iinc 9 by 1  Increment local variable by constant 直接在local variables上操作
          * 110 iload 9           12
          * 112 iadd
          * 113 istore 10         22
