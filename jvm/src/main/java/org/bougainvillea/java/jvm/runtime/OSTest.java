@@ -1,5 +1,9 @@
 package org.bougainvillea.java.jvm.runtime;
 
+/**
+ * i++
+ * ++i
+ */
 public class OSTest {
     public static void main(String[] args) {
         new OSTest().test();
