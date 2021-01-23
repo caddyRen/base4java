@@ -198,11 +198,29 @@
 Java中任何一个普通方法其实都具备虚函数的特征，相当于c++语言中的虚函数（c++中需要使用关键字virtual来显示定义）
 如果java程序中不希望某个方法拥有虚函数的特征，使用关键字final修饰（不能被重写，编译期确定，不再具备多态性）
 ```
-- 多态
+- 多态----类继承，且重写方法
 ```text
+子类对象的多态性前提：1.类的继承 2.方法的重写
 面向对象的高级语言，尽管在语法风格上存在差异，但是都支持封装、继承、多态等面向对象特性
 具备多态性，就具备early binding和late binding两种绑定方式，使在编译期确定具体调用哪个方法
 ```
+- 虚方法
+    - 具有多态的方法
+    - 除了静态方法、私有方法、final方法、实例构造器、父类方法
+    - invokevirtual：调用所有虚方法（final修饰的方法除外，final修饰的方法也使用invokevirtual指令）
+    - invokeinterface：调用接口方法
+    - 
+- 非虚方法
+    - 不具有多态的方法
+    - invokestatic和invokespecial指令调用的方法称为非虚方法，其余的（final修饰的除外）称为虚方法
+    - 方法在编译期确定具体的调用版本，这个版本在运行时不可变
+    - 静态方法、私有方法、final方法、实例构造器、父类方法都是非虚方法
+    - invokestatic：调用静态方法，ClassLoaderSubSystem.Linking.Resolve时(解析阶段)确定唯一方法版本
+    - invokespecial：调用<init>方法、私有方法、父类方法，解析阶段确定唯一方法版本
+- 动态调用指令
+    - invokedynamic：动态解析出需要调用的方法，然后执行
+    - invokevirtual、invokeinterface、invokestatic、invokespecial指令固化在JVM内部，方法的调用执行不可认为干预
+    - invokedynamic指令支持由用户确定方法版本
 ## return address
 
 ## 附加信息
