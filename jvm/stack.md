@@ -219,8 +219,19 @@ Java中任何一个普通方法其实都具备虚函数的特征，相当于c++�
     - invokespecial：调用<init>方法、私有方法、父类方法，解析阶段确定唯一方法版本
 - 动态调用指令
     - invokedynamic：动态解析出需要调用的方法，然后执行
-    - invokevirtual、invokeinterface、invokestatic、invokespecial指令固化在JVM内部，方法的调用执行不可认为干预
+    - invokevirtual、invokeinterface、invokestatic、invokespecial指令固化在JVM内部，方法的调用执行不可人为干预
     - invokedynamic指令支持由用户确定方法版本
+### 方法重写的本质
+1. 找到operand stack 栈顶元素所执行的对象的实际类型，记作c（当调用一个对象的方法时，会先把该方法的对象压入operand stack，通常为invokevirtual）
+2. 如果在类型c中找到与常量中 描述符、简单名称都相符的方法（查找c中有没有该方法），则进行访问权限校验，如果权限校验通过，则返回这个方法的直接引用，查找过程结束，如果访问权限校验不通过，则返回java.lang.IllegalAccessError异常
+3. 如果在类型c中没找到与常量中 描述符、简单名称都相符的方法（查找c中有没有该方法），按照继承关系从下往上依次对c的各个父类进行第二步的搜索和验证
+4. 如果始终没有找到合适的方法，则抛出java.lang.AbstractMethodError异常
+- IllegalAccessError异常（jar冲突可能会出现）：程序试图访问或修改一个属性或调用一个方法，当这个属性或方法没有权限访问，一般会引起编译器异常，这个错误如果发生在运行时，就说明一个类发生了不兼容的改变。
+### 虚方法表
+- 在面向对象编程OOP，频繁的使用到动态分派，若每次动态分派的过程都要重新在类的方法元数据中搜索合适的目标，会影响执行效率
+- JVM采用在类的方法区建立一个虚方法表virtual method table ，非虚方法不会出现在表中，使用索引表来代替查找
+- 每个类中都有一个虚方法表，表中存放着各个方法的实际入口
+- 虚方法表在ClassLoaderSubSystem.Linking.resolve(将常量池内的符号引用转换为直接引用)阶段被创建并开始初始化，类的变量初始值准备完成后，JVM会把该类的方法表也初始化完毕
 ## return address
 
 ## 附加信息
