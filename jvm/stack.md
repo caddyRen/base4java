@@ -281,7 +281,7 @@ Java中任何一个普通方法其实都具备虚函数的特征，相当于c++�
 1. 栈溢出的情况？
     - Xss10M 设置stack size
     - stack固定分配大小，当最后一个stack frame所占内存大于stack的剩余容量即会出现StackOverFlowError
-    - stack动态分配，当申请容量时，物理机剩余内存不够，则OutOfMemory
+    - stack动态分配，当尝试扩展的时候无法申请到足够的内存，或者在创建新的线程时没有足够的内存去创建对应的JVM stack，则OutOfMemoryError
 2. 调整stack大小，能保证不出现溢出吗
     - stack frame不确定，方法嵌套调用深度不确定，故扩大stack size不能100%保证不出现溢出，最多延迟溢出的时间
     - eg： 递死归
