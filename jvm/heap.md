@@ -66,29 +66,39 @@
 
 - 注意
     - 当Eden区满时才会触发YGC，Survivor0或1区满不会触发YGC
-    - YGC回收Eden区和From区
-    - Survivor 0区和Survivor 1区大小1：1，使用了复制算法，目的是解决碎片化问题 
+    - YGC回收Eden区和From区（YGC后会清空Eden区和From区）
+    - Survivor 0区和Survivor 1区大小1：1，肯定会有一个为空。为了使用复制算法，目的是解决碎片化问题 
     - Survivor 0区和Survivor 1区：复制之后有交换，谁空谁时To区
     - Garbage Collection频繁在Young区收集，很少在Old区收集，几乎不在Perm/Meta收集
     - 对象可能直接分配在Old区
     - Eden区和To区满了，对象即使没达到阈值，也可能直接晋升到Old区
-
+- ![image](img/young_old.png)
 ```text
-1. new的对象先放在Eden区，Eden区有大小限制
-2. 当Eden区的空间满时，又需要new新的对象，此时JVM会对Eden区进行一次Minor GC(YGC)。将Eden区内的不再被其他对象所引用的对象进行销毁。
-    1. 将Eden区内未被销毁的对象，移动到Survivor 0区，并且标识移动次数1
-    2. 将new的新对象放到Eden区
-3. 当Eden区空间再满时，再次触发YGC。此时JVM将Eden区和Survivor 0区（此时Survivor 0区称为From区）内不再被其他对象所引用的对象进行销毁。
-    1. 将幸存的对象移动到Survivor 1区（此时也叫To区）。
-        1. Eden区移到To区，移动次数为1
-        2. From区移到To区，移动次数+1=2
-    2. 将new的新对象放到Eden区
-4. 当Eden区空间再满时，再次触发YGC。此时JVM将Eden区和Survivor 1区（此时Survivor 1区称为From区）内不再被其他对象所引用的对象进行销毁。
-    1. 将幸存的对象移动到Survivor 0区（此时也叫To区）。
-        1. Eden区移到To区，移动次数为1
-        2. From区移到To区，移动次数+1=3
-    2. 将new的新对象放到Eden区。
-5. 之后就是重复3步和4步，直到From区内出现移动次数达到阈值的对象，则进行Promotion，即将From区内的达到阈值的对象移到Old区，并且移动次数再+1 
+1. new的对象优先尝试放Eden区，Eden区可能已有对象
+2. 如果Eden区剩余空间放得下，则直接在Eden区为对象分配内存
+3. 如果Eden区剩余空间放不下，则触发Minor GC(YGC)，YGC会将Eden区和From区清空
+    1. 将Eden区和From区内的不再被其他对象所引用的对象进行销毁。
+    2. 将Eden区和From区内幸存的对象，移动到To区，并且标识移动次数加1次
+    3. 此时Eden区为空，再次判断Eden区是否放得下
+        1. 放得下则放Eden区
+        2. 放不下则尝试放Old区（一般是超大对象）
+            1. 放得下，直接将对象放置到Old区
+            2. 放不下，则触发FGC，回收一次Old区，再进行判断Old区是否放的下
+                1. 放得下则直接将对象放置到Old区
+                2. 放不下则OOM
+4. Survivor 0区和Survivor 1区
+    1. 当JVM进程第一次触发YGC。将Eden区内的不再被其他对象所引用的对象进行销毁。
+    2. 将Eden区所有幸存对象，尝试移到Survivor 0区（会将Eden区清空）
+        1. 当Survivor 0 区空间放得下则放在Survivor 0区，移动次数加1
+        2. 幸存对象太大放不下，则直接晋升老年代，放到Old区，移动次数加1
+    3. 当Eden区和Survivor 0或1区有数据时触发了YGC。此时JVM将Eden区和Survivor 0区（此时Survivor 0区称为From区）内不再被其他对象所引用的对象进行销毁。(此时的From区要根据实际情况来定，此处只是例子说明)
+        1. 尝试将幸存的对象移动到Survivor 1区（此时也叫To区）。
+            1. 当From区幸存对象阈值等于设置的值
+                1. 则Promotion晋升老年代Old区，移动次数加1
+            2. 当From区幸存对象阈值小于设置的值
+                1. To区放得下则放到To区，移动次数加1
+                2. To区放不下直接放Old区，移动次数加1（此时Old区正常设置参数肯定放的下，因为Young空间一般都比Old空间小）
+    4. 之后就是重复3步 
 ```
 
 # 工具
