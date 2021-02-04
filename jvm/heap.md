@@ -14,6 +14,18 @@
 - 在方法结束后，堆中对象不会马上被移除，仅仅在垃圾收集的时候才会被移除
 - heap area 是Garbage Collection执行垃圾回收的重点区域
 
+## Heap 分代思想
+1. 经研究，不同对象的生命周期不同，70%~99%的对象是临时对象
+    1. 新生代: 由Eden、两块大小相同的Survivor区（s0、s1或from、to）构成（to总是空的）
+    2. 老年代: 存放新生代中经历多次GC仍存活的对象
+2. 不分代完全可以
+```text
+分代的唯一理由就是优化GC性能
+如果没有分代，将所有的对象都放在一块，GC时找哪些对象没有用，此时需要对所有区域进行扫描，STW（stop the work）时间相对分代策略会变长
+而很对对象都是朝生夕死，
+如果分代，把新创建的对象放到某一地方，GC时先把这块存储新创建对象的区域进行回收，STW时间相对不分代的扫描全部区域小很多
+```
+
 ## heap area 细分 现代垃圾收集器大部分都基于分代收集理论设计
 
 - 新生区--新生代--年轻代
@@ -100,6 +112,41 @@
                 2. To区放不下直接放Old区，移动次数加1（此时Old区正常设置参数肯定放的下，因为Young空间一般都比Old空间小）
     4. 之后就是重复3步 
 ```
+### 内存分配策略
+```text
+对象提升Promotion规则：
+    如果对象在Eden出生并经过第一次MinorGC后仍存活，并且能倍Survivor容纳的化，将被移动到Survivor空间，并将对象年龄设为1
+    对象在Survivor区中每熬过一次MinorGC年龄就增加1岁，当它的年龄增加到一定程度(默认15岁，每个JVM每个GC都有所不同)时，就会晋升Promotion到老年代
+
+对象晋升老年代的年龄阈值，可以通过-XX:MaxTenuringThreshold来设置
+
+针对不同年龄段的对象分配原则：
+    1.优先分配到Eden
+    2.大对象直接分配到老年代
+        1.尽量避免程序中出现过多的大对象(连续的内存空间，更高概率触发GC)
+    3.长期存活的对象分配到老年代（经过多次YGC仍存活，达到阈值则晋升到老年代）
+    4.动态对象年龄判断
+        1.如果Survivor区中相同年龄的所有对象大小的综合大于Survivor空间的一半，年龄大于或等于该年龄的对象可以直接进入老年代
+            无须等到MaxTenuringThreshold中要求的年龄
+    5.空间分配担保
+        1. -XX:HandlePromotionFailure
+```
+### 空间分配担保
+```text
+在发生MinorGC之前，虚拟机会检查老年代最大可用的连续空间是否大于新生代所有对象的总空间
+    1.如果大于则此次MinorGC是安全的
+    2.如果小于则虚拟机会查看-XX:HandlePromotionFailure设置值是否运行担保失败
+        1.如果-xx:HandlePromotionFailure=true会继续检查老年代最大可用连续空间是否大于历次晋升老年代的对象的平均大小
+            1.大于，则尝试进行一次MinorGC，但这次MinorGC是有风险的
+            2.小于，则改为进行一次FullGC
+        2.如果-xx:HandlePromotionFailure=false则改为进行一次FullGC
+在JDK6 Update24之后，HandlePromotionFailure参数不会再影响到JVM的空间分配担保策略，虽然OpenJDK源码中仍定义了HandlePromotionFailure参数，但是在代码中已经不会再使用它
+规则变更为
+    Old区的连续空间大于新生代对象总大小进行MinorGC
+    Old区的连续空间大于历次晋升的平均大小进行MinorGC
+    否则进行FullGC
+```
+
 
 # 工具
 
@@ -164,18 +211,16 @@ C:\>jinfo -flag SurvivorRatio 3164
 -XX:SurvivorRatio=8
 
 ```
+- 查看UseTLAB
 
-# JVM参数
+```text
+C:\>jps
+4448
+2164 Jps
+8324 GradleDaemon
+3164 EdenSurvivortest
 
-## 设置heap area size
+C:\>jinfo -flag UseTLAB 3164
+-XX:+UseTLAB
 
-1. -Xms10M等价于-XX:InitialHeapSize 初始heap size 只影响新生区和养老区 默认情况初始内存大小：物理电脑内存大小 /64
-2. -Xmx10M等价于-XX:MaxHeapSize 最大heap size 只影响新生区和养老区 默认情况最大内存大小：物理电脑内存带下 /4
-3. 通常将-Xms -Xmx设置为相同的值，目的是为了能够在Java垃圾回收机制清理完堆区后不需要重新分割计算堆区的大小从而提高性能
-4. 一旦堆区中的内存大小超过-Xmx所指定的最大内存时，将会抛出OutOfMemoryError异常
-5. -XX:NewRatio=2 默认2，设置Young和Old的比例表示Young占1份，Old占2份；设置-XX:NewRatio=4，表示Young占1份，Old占4份
-5. -Xmn100M （一般不使用）设置新生代Young的大小，当与-XX:NewRatio=2冲突时，-Xmn生效，
-6. -XX:SurvivorRatio=8,(官方文档默认值8：1：1但实际是6：1：1，显式设置8才会生效),设置Young区下的Eden区和Young区下survivor0区、survivor1区的比例是8：1：1
-7. -XX:-UseAdaptiveSizePolicy关闭自适应的内存分配策略
-8. -XX:MaxTenuringThreshold=<N> 设置去老年区的阈值默认是15次
-   
+```
