@@ -1,2 +1,12 @@
 dependencies {
 }
+compileJava {
+    tasks.withType(JavaCompile) {
+        options.bootstrapClasspath = fileTree("${System.getenv("JAVA_HOME")}/jre/lib/")
+    }
+}
+compileTestJava {
+    tasks.withType(JavaCompile) {
+        options.bootstrapClasspath = fileTree("${System.getenv("JAVA_HOME")}/jre/lib/")
+    }
+}

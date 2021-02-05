@@ -82,3 +82,11 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.191-b12, mixed mode) 'Server模式'
    -XX:+EliminateAllocations '默认开启标量替换'
    -XX:-EliminateAllocations '关闭标量替换'
    ```
+## 设置 Method area size
+   ```shell
+   -XX:PermSize=20.75M 'JDK7及以前设置PermanentGenerationSpace 初始值 默认20.75M'
+   -XX:MaxPermSize=82M 'JDK7及以前设置PermanentGenerationSpace 最大可分配空间，32位机器默认是64M，64位机器默认是82M'
+   
+   -XX:MetaspaceSize=21M 'JDK8及以后，设置元空间初始值，平台不同默认值不同，windows下默认约为21M'
+   -XX:MaxMetaspaceSize=-1 'JDK8及以后，设置元空间最大可分配空间，-1表示没有限制'
+   ```

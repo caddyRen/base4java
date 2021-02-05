@@ -2,10 +2,11 @@ package java.lang;
 
 /**
  * 与java核心api 同名，同包
- *
+ * 此处定义的测试String 会引起IDEA编译String相关方法和构造器混乱，故注释掉
+ * 
  * @author caddy
  */
-public class String {
+public class StringDemo {
 
     /**
      * 静态代码块，正常的类 由AppClassLoader加载时会执行
@@ -33,7 +34,7 @@ public class String {
      *
      * Error: Main method not found in class java.lang.String
      */
-    public static void main(String[] args) {
+    public static void main(StringDemo[] args) {
         System.out.println("自定义java.lang.java");
     }
 }
