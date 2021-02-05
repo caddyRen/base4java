@@ -2,6 +2,7 @@
 ## JDK命令
 - jps
 - javap
+    - javap -v -p MetaspaceOOMTest.class > test.txt 将内容写入到当前目录下的test.txt文件内 -p表示输出private权限修饰符的属性
 - jstat
 - jinfo
 - jmap

@@ -56,6 +56,34 @@ request, the Java Virtual Machine throws an OutOfMemoryError.
 - 为了避免频繁GC，建议将-XX:MetaspaceSize设置为一个相对较高的值
 
 ## 方法区内部结构
+- method area标准的存储内容，后续会变化
+    - 类型信息：类class、接口interface、枚举enum、注解annotation等
+        1. 这个类型的完整有效名称（全名=包名.类名）
+        2. 这个类型直接父类的完整有效名（对于interface或java.lang.Object都没有父类）
+        3. 这个类型的修饰符（public、abstract、final的某个子集）
+        4. 这个类型直接接口的一个有序列表
+    - 域信息（field/属性/常量）：运行时常量池，随着JDK变化，StringTable存储位置也会变化
+        1. JVM必须在方法区中保存类型信息的所有域的相关信息以及域的声明顺序
+        2. 域的相关信息包括
+            1. 域名称
+            2. 域类型
+            3. 域修饰符（public、private、protected、static、final、volatile、transient的某个子集）
+    - 静态常量（non-final static变量）：随着JDK变化，存储位置会变化
+        1. 静态变量和类关联在一起，随着类的加载而加载，他们称为类数据在逻辑上的一部分
+        2. 类变量被类的所有实例共享，即使没有类实例也可以访问
+    - 即时编译器JIT编译后的代码缓存
+    - 方法信息
+        1. 方法名称
+        2. 方法的返回类型（void也是一种类型）
+        3. 方法参数的数量和类型（按顺序）
+        4. 方法的修饰符（public、private、protected、static、final、synchronized、native、abstract的一个子集）
+        5. 方法的字节码（byte codes）、OperandStack、LocalVariables及大小（abstract和native方法除外）
+        6. 异常表（abstract和native除外）
+            ```text
+            每个异常处理的开始位置、结束位置、代码处理在Program Counter Register中的偏移地址、被捕获的异常类的常量池索引
+            ```
+    - static final全局常量
+        1. 被声明为final的类变量的处理方法不同每个全局常量在编译的时候就会被分配
 
 ## 方法区使用举例
 ## 方法区的演进细节
