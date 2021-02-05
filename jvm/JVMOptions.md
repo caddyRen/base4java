@@ -1,4 +1,13 @@
 # JVM Options
+## 注意
+- 参数-server 启动server模式，64位系统默认是Server模式，在server模式下才可以启用逃逸分析
+```shell
+C:\>java -version
+java version "1.8.0_191"
+Java(TM) SE Runtime Environment (build 1.8.0_191-b12)
+Java HotSpot(TM) 64-Bit Server VM (build 25.191-b12, mixed mode) 'Server模式'
+```
+
 ## 查看所有参数的默认初始值
    ```shell
    -XX:+PrintFlagsInitial
@@ -61,4 +70,15 @@
 ## 设置空间分配担保（JDK6_24后失效）
    ```shell
    -XX:HandlePromotionFailure=true 'JDK6 Update24之后该参数失效'
+   ```
+## 逃逸分析（JDK6u23后默认开启）
+   ```shell
+   -XX:+DoEscapeAnalysis '默认开启逃逸分析'
+   -XX:-DoEscapeAnalysis '关闭逃逸分析'
+   -XX:+PrintEscapeAnalysis '查看逃逸分析的筛选结果'
+   ```
+## 标量替换
+   ```shell
+   -XX:+EliminateAllocations '默认开启标量替换'
+   -XX:-EliminateAllocations '关闭标量替换'
    ```
