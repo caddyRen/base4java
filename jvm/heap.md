@@ -17,7 +17,7 @@
 - java heap area在JVM启动时即被创建，其空间大小也就确定了，是JVM管理的最大一块内存空间
     - heap area size是可以调节的
 - java虚拟机规范 规定 heap可以处于物理上不连续的内存空间中，但在逻辑上它应该被视为连续的
-- 所有线程共享java heap area 在这里还可以划分线程私有的缓冲区（TLAB：Thread local allocation buffer）
+- 所有线程共享java heap area 在这里还可以划分线程私有的缓冲区[TLAB：Thread local allocation buffer](TLAB.md)
 - JVM规范对Java Heap描述为：所有对象实例以及数组都应当在运行时分配在堆上（The heap is the run-time data area from which memory for all class instances
   and arrays is allocated）
     - 几乎所有的对象实例都在这里分配内存，almost 不是 all
@@ -126,7 +126,7 @@
                 2. To区放不下直接放Old区，移动次数加1（此时Old区正常设置参数肯定放的下，因为Young空间一般都比Old空间小）
     4. 之后就是重复3步 
 ```
-
+### [Garbage Collection](GC.md)
 ### 内存分配策略
 
 ```text
@@ -254,80 +254,4 @@
 - 标量替换为栈上分配提供了很好的基础
 - -XX:+EliminateAllocations开启标量替换(默认开启)，允许将对象打散分配在stack上
 
-# 工具
-
-## 查看JVM进程内存
-
-### jvisualvm
-
-- C:\Program Files\Java\jdk1.8.0_191\bin\jvisualvm.exe
-    - 当配置Path java环境变量可以直接输入jvisualvm启动
-    - 工具-插件-Virtual GC
-
-### jps & jstat -gc
-
-- jps查看java进程获得进程号
-- jstat -gc 进程号
-
-```text
-C:\Users\renqiankun>jps
-2208 GradleDaemon
-1300
-12856 Jps
-12968 GradleDaemon
-808 Main
-13772 HeapSpaceInitial
-
-C:\Users\renqiankun>jstat -gc 13772
- S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT
-25600.0 25600.0  0.0    0.0   153600.0  6144.0   409600.0     0.0     4480.0 775.8  384.0   76.4       0    0.000   0      0.000    0.000
-```
-
-### -XX:+PrintGCDetails
-
-- 运行时加命令行参数-XX:+PrintGCDetails 运行时打印内存详细信息
-
-```text
-Heap
- PSYoungGen      total 179200K, used 6144K [0x00000000f3800000, 0x0000000100000000, 0x0000000100000000)
-  eden space 153600K, 4% used [0x00000000f3800000,0x00000000f3e00188,0x00000000fce00000)
-  from space 25600K, 0% used [0x00000000fe700000,0x00000000fe700000,0x0000000100000000)
-  to   space 25600K, 0% used [0x00000000fce00000,0x00000000fce00000,0x00000000fe700000)
- ParOldGen       total 409600K, used 0K [0x00000000da800000, 0x00000000f3800000, 0x00000000f3800000)
-  object space 409600K, 0% used [0x00000000da800000,0x00000000da800000,0x00000000f3800000)
- Metaspace       used 2637K, capacity 4486K, committed 4864K, reserved 1056768K
-  class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
-```
-
-### jps & jinfo -flag NewRatio / jinfo -flag SurvivorRatio
-
-- 查看NewRatio
-
-```text
-C:\>jps
-4448
-2164 Jps
-8324 GradleDaemon
-3164 EdenSurvivortest
-
-C:\>jinfo -flag NewRatio 3164
--XX:NewRatio=2
-
-C:\>jinfo -flag SurvivorRatio 3164
--XX:SurvivorRatio=8
-
-```
-
-- 查看UseTLAB
-
-```text
-C:\>jps
-4448
-2164 Jps
-8324 GradleDaemon
-3164 EdenSurvivortest
-
-C:\>jinfo -flag UseTLAB 3164
--XX:+UseTLAB
-
-```
+## [内存分析工具](tools.md)

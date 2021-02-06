@@ -1,13 +1,16 @@
 # Method area 方法区
 
 ## stack、heap、method交互关系
+
 ```text
 Person p=new Person();
 Person类信息保存在Method area
 new Person()实例对象保存在heap
 如果此句在方法内部，则p是一个reference引用类型保存在stack
 ```
+
 ## method area 理解
+
 ```text
 2.5.4 Method Area
 The Java Virtual Machine has a method area that is shared among all Java Virtual
@@ -31,21 +34,26 @@ The following exceptional[特殊] condition[情况] is associated with[有关联
 • If memory in the method area cannot be made available to satisfy[满足] an allocation[分配]
 request, the Java Virtual Machine throws an OutOfMemoryError.
 ```
+
 - 方法区有一个别名叫Non-Heap非堆
 - 方法区是一块独立于Java堆的内存空间
 - 方法区保存类信息
 - 线程共享
 - 大小可以选择固定大小或者可扩展
-- 方法区大小决定系统可以保存多少个类，如果系统定义了太多的类，导致方法区溢出，JVM抛出java.lang.OutOfMemoryError: PermGen space/java.lang.OutOfMemoryError: Metaspace
+- 方法区大小决定系统可以保存多少个类，如果系统定义了太多的类，导致方法区溢出，JVM抛出java.lang.OutOfMemoryError: PermGen space/java.lang.OutOfMemoryError:
+  Metaspace
     - 例子：加载大量的第三方jar包
     - Tomcat部署的工程过多（30-50个）
     - 大量动态的生产反射类
 - 关闭JVM就会释放这个方法区的内存
-## 设置method area大小与OOM
+
+## [设置method area大小](JVMOptions.md)与[OOM](OOM.md)
+
 1. -XX:PermSize=20.75M 'JDK7及以前设置PermanentGenerationSpace 初始值 默认20.75M'
 2. -XX:MaxPermSize=82M 'JDK7及以前设置PermanentGenerationSpace 最大可分配空间，32位机器默认是64M，64位机器默认是82M'
 3. -XX:MetaspaceSize=21M 'JDK8及以后，设置元空间初始值，平台不同默认值不同，windows下默认约为21M'
 4. -XX:MaxMetaspaceSize=-1 'JDK8及以后，设置元空间最大可分配空间，-1表示没有限制'
+
 - 如果不指定大小，默认情况下，JVM会耗尽所有的可用系统内存，如果元空间发生溢出，虚拟机一样会抛出java.lang.OutOfMemoryError: Metaspace
 - 设置初始Metaspace大小，对于一个64位的服务器端JVM来说，其默认的-XX:MetaspaceSize值为21MB
 - 21M是初始的高水位线，一旦触及这个水位线FullGC将会被触发并卸载没用的类（这些类对应的类加载器不再存活）
@@ -56,6 +64,7 @@ request, the Java Virtual Machine throws an OutOfMemoryError.
 - 为了避免频繁GC，建议将-XX:MetaspaceSize设置为一个相对较高的值
 
 ## 方法区内部结构
+
 - method area标准的存储内容，后续会变化
     - 类型信息：类class、接口interface、枚举enum、注解annotation等
         1. 这个类型的完整有效名称（全名=包名.类名）
@@ -94,9 +103,13 @@ request, the Java Virtual Machine throws an OutOfMemoryError.
             - 动态举例，String.intern()如果运行时常量池中没有该字符串，则在运行时常量池放一个字符串常量，（native方法）
         - 运行时常量池类似于传统编程语言中的符号表（symbol table），但是它所包含的数据却比符号表要更加丰富一些
         - 当创建类或接口的运行时常量池时，如果构造运行时常量池所需的内存空间超过了方法区所能提供的最大值，则JVM会抛OOM异常
+
 ### 字节码文件
+
 - 一个有效的字节码文件中除了包含类的版本信息、字段、方法以及接口等描述信息外，还包含一项信息那就是常量池表ConstantPoolTable，包括各种字面量和对类型、域、方法的符号引用
+
 ### 字节码文件为什么需要常量池
+
 ```text
 一个Java源文件中的类、接口，编译后产生一个字节码文件。
 Java中的字节码需要数据支持，通常这种数据会很大，以至于不能直接存在字节码里，
@@ -106,23 +119,95 @@ Java中的字节码需要数据支持，通常这种数据会很大，以至于�
 
 常量池，可以看作是一张表，虚拟机指令根据这张常量表找到要执行的类名、方法名、参数类型、字面量等类型
 ```
+
 ### 运行时常量池vs常量池
+
 - methad area内部包含了运行时常量池
 - 字节码文件内部包含了常量池 Constant pool
-- ClassLoaderSubSystem将字节码文件加载到RuntimeDataArea，其中字节码文件中的常量池ConstantPool被加载到MethodArea后，就是运行时常量池    
+- ClassLoaderSubSystem将字节码文件加载到RuntimeDataArea，其中字节码文件中的常量池ConstantPool被加载到MethodArea后，就是运行时常量池
 
-## 方法区使用举例
 ## 方法区的演进细节
+
 - jdk7以前习惯上把方法区称为永久代 Permanent Generation space
 - jdk8开始使用MetaSpace元空间取代永久代
 - 本质上方法区和永久代并不等价，仅对Hotspot而言两者等价
 - JVM规范对如何实现方法区不做统一要求，BEA的JRockit和IBM J9中不存在永久代的概念
 - 永久代导致java程序更容易OOM，超过-XX:MaxPermSize上限
-  
+
 - JDK8完全废弃永久代的概念，改用JRockit、J9一样在本地内存中实现MetaSpace来代替
 - MetaSpace的本质和Permanent Generation space类似，都是对JVM规范中method area的实现
 - MeatSpace不在JVM设置的内存中，而是直接使用本地物理内存，可以设置的更大，更不容易OOM
 - PermGenSpace在JVM设置的内存中，所以容易OOM
 - 根据JVM规范，如果方法区无法满足新的内存分配需求时，将抛出OOM
+
+- Hotspot中Method area变化
+    - jdk1.6及之前：有永久代permanent generation
+        - 永久代保存信息（JVM内存）
+            - 类型信息、域信息、方法信息、JIT代码缓存、静态变量、运行时常量池、StringTable（在运行时常量池内）
+    - jdk1.7：有永久代permanent generation，逐步”去永久代“，字符串常量池、静态变量移除，保存在堆中
+        - 永久代保存信息（JVM内存）
+            - 类型信息、域信息、方法信息、JIT代码缓存、运行时常量池
+        - heap保存（JVM内存）
+            - 静态变量、StringTable
+    - jdk1.8及之后：无永久代，类型信息、字段、方法、常量保存在本地内存的metaSpace，但字符串常量池、静态变量仍在堆
+        - Metaspace（直接使用的是物理机内存）
+            - 类型信息、域信息、方法信息、JIT代码缓存、运行时常量池
+        - heap保存（JVM内存）
+            - 静态变量、StringTable
+- [为什么使用Metaspace替换PermanentGenerationSpace](http://openjdk.java.net/jeps/122)
+```text
+Motivation[动机]
+This is part of the JRockit and Hotspot convergence effort.
+JRockit customers do not need to configure the permanent generation (since JRockit does not have a permanent generation) 
+and are accustomed to not configuring the permanent generation.
+```
+1. 为PermanentGenerationSpace设置空间大小很难确定
+   ```text
+   某些场景下，动态加载类过多，容易产生Perm区的OOM。
+   比如某个实际Web工程中，因为功能点比较多，在运行过程中要不断动态加载很多类，经常出现致命错误OOM
+   使用Metaspace和PermGenSpace最大区别在于：Metaspace并不在JVM中，而是使用本地物理机内存，
+   因此默认情况下，Metaspace的大小仅受本地内存限制
+   ```
+2. 对PermanentGenerationSpace调优很困难（FullGC）
+### StringTable为什么要调整
+```text
+JDK7中将StringTable放到heap中，因为PermGenSpace的回收效率很低，在FullGC的时候才会触发
+而FullGC是Old区空间不足、PermGenSpace不足时才会触发
+导致StringTable回收效率不高，而开发中会有大量的字符串被创建，回收效率低，导致PermGenSpace空间不足。
+放在heap区能即使回收内存
+```
+### 静态变量放在哪里
+- new出的实例对象都在heap区
+- 对象引用存放位置
+    1. 非静态属性，在heap区
+    2. 方法内的局部变量，在栈帧的局部变量表内
+    3. 静态属性，在java.lang.Class对象内
+        ```text
+        《java虚拟机规范》定义的概念模型，所有Class相关的信息都应该存放在方法区中，但方法区如何实现《java虚拟机规范》并未做出规定
+        这就成了一件允许不同虚拟机自己灵活把握的事情
+        JDK7及其以后版本的Hotspot虚拟机选择把静态变量引用与类型在java语言一段的映射Class对象存放在一起，存储于Java堆中
+        ```
 ## 方法区的垃圾回收
+- 主要回收两部分
+    1. 常量池中废弃的常量
+        1. 字面量：如文本字符串、被声明为final的常量值等
+        2. 符号引用
+            1. 类和接口的全限定名
+            2. 字段的名称和描述符
+            3. 方法的名称和描述符
+    2. 不再使用的类型
+        - 回收的条件
+            1. 该类所有的实例都已经被回收，也就是heap中不存在该类及任何派生子类的实例
+            2. 加载该类的类加载器已经被回收，这个条件除非是经过精心设计的可替换类加载器的场景，如OSGi、JSP的重加载等，否则通常很难达成
+            3. 该类对应的java.lang.Class对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法
+        - JVM被允许对满足上述三个条件的无用类进行回收，这里说的仅仅是被允许，而并不是和对象一样，没有引用就必然会回收，关于是否要对类型进行回收
+            - Hotspot提供了-Xnoclassgc参数进行控制
+            - 可以使用如下参数查看类加载和卸载信息 
+                - -verbose:class
+                - -XX:+TraceClass-Loading
+                - -XX:+TraceClassUnLoading
+        - 在大量使用反射、动态代理、CGLib等字节码框架，动态生成JSP以及OSGi这类频繁自定义类加载器的场景中，通常都需要JVM具备类型卸载的能力，以保证不会对方法区造成过大的内存压力
+- Hotspot对常量池的回收策略很明确，只要常量池中的常量没有被任何地方引用，就可以被回收
+- 回收废弃常量与回收heap中java对象非常类似
+
 ## 总结
