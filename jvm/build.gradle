@@ -1,12 +1,25 @@
+
 dependencies {
 }
+
+task getJavaHome {
+    if (System.properties['os.name'].toLowerCase().contains('windows')) {
+        ext.javaHome = "${System.getenv("JAVA_HOME")}"
+    } else {
+        ext.javaHome = "/usr/lib/jvm/jdk1.8.0_241"
+    }
+    println "${System.getenv("JAVA_HOME")}"
+    println getJavaHome.javaHome
+}
+
 compileJava {
     tasks.withType(JavaCompile) {
-        options.bootstrapClasspath = fileTree("${System.getenv("JAVA_HOME")}/jre/lib/")
+        options.bootstrapClasspath = fileTree(getJavaHome.javaHome+"/jre/lib/")
     }
 }
+
 compileTestJava {
     tasks.withType(JavaCompile) {
-        options.bootstrapClasspath = fileTree("${System.getenv("JAVA_HOME")}/jre/lib/")
+        options.bootstrapClasspath = fileTree(getJavaHome.javaHome+"/jre/lib/")
     }
 }
