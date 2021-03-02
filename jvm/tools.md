@@ -207,6 +207,20 @@ Command line:  -XX:SurvivorRatio=8 -XX:SurvivorRatio=8 -Xms600M -Xmx600M -Dfile.
 java version "1.8.0_241"
 Java(TM) SE Runtime Environment (build 1.8.0_241-b07)
 Java HotSpot(TM) 64-Bit Server VM (build 25.241-b07, mixed mode)
+C:\>jps
+4448
+2164 Jps
+8324 GradleDaemon
+3164 EdenSurvivortest
+
+C:\>jinfo -flag UseTLAB 3164
+-XX:+UseTLAB
+
+C:\>jinfo -flag NewRatio 3164
+-XX:NewRatio=2
+
+C:\>jinfo -flag SurvivorRatio 3164
+-XX:SurvivorRatio=8
 ```
 
 ### jmap
@@ -615,23 +629,7 @@ For more information about a specific command use 'help <command>'.
 
 ### 示例
 
-#### 查看GC
-
-```text
-C:\Users\renqiankun>jps
-2208 GradleDaemon
-1300
-12856 Jps
-12968 GradleDaemon
-808 Main
-13772 HeapSpaceInitial
-
-C:\Users\renqiankun>jstat -gc 13772
- S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT
-25600.0 25600.0  0.0    0.0   153600.0  6144.0   409600.0     0.0     4480.0 775.8  384.0   76.4       0    0.000   0      0.000    0.000
-```
-
-#### -XX:+PrintGCDetails
+#### -XX:+PrintGCDetails 
 
 - 运行时加命令行参数-XX:+PrintGCDetails 运行时打印内存详细信息
 
@@ -647,55 +645,30 @@ Heap
   class space    used 281K, capacity 386K, committed 512K, reserved 1048576K
 ```
 
-#### jps & jinfo -flag NewRatio / jinfo -flag SurvivorRatio
-
-- 查看NewRatio/SurvivorRatio
-
-```text
-C:\>jps
-4448
-2164 Jps
-8324 GradleDaemon
-3164 EdenSurvivortest
-
-C:\>jinfo -flag NewRatio 3164
--XX:NewRatio=2
-
-C:\>jinfo -flag SurvivorRatio 3164
--XX:SurvivorRatio=8
-
-```
-
-- 查看UseTLAB
-
-```text
-C:\>jps
-4448
-2164 Jps
-8324 GradleDaemon
-3164 EdenSurvivortest
-
-C:\>jinfo -flag UseTLAB 3164
--XX:+UseTLAB
-
-```
-
-## Eclipse: Memory Analyzer Tool
-
 ## Jconsole
-
 ## jvisualvm
-
 - C:\Program Files\Java\jdk1.8.0_191\bin\jvisualvm.exe
     - 当配置Path java环境变量可以直接输入jvisualvm启动
     - 工具-插件-Virtual GC
-
+## Eclipse: Memory Analyzer Tool
+- http://www.eclipse.org/mat/downloads.php
+- wget https://mirrors.bfsu.edu.cn/eclipse/mat/1.11.0/rcp/MemoryAnalyzer-1.11.0.20201202-linux.gtk.x86_64.zip
+- ln -s /opt/mat/MemoryAnalyzer /usr/local/bin/mat
 ## Jprofiler
+## Arthas
+- https://github.com/alibaba/arthas
+- https://arthas.aliyun.com/zh-cn/
+- https://arthas.aliyun.com/doc/quick-start.html
 
 ## Java Flight Recorder（JMC下的工具）
-
+- 取样对象需要启动参数
+    1. -XX:+UnlockCommercialFeatures
+    2. -XX:+FlightRecorder
 ## GCViewer
 
 ## GC Easy
 
 ## jhsdb(JDK9之后添加的工具)
+## jmeter
+- wget https://mirrors.bfsu.edu.cn/apache/jmeter/binaries/apache-jmeter-5.4.1.tgz
+- ln -s /opt/apache-jmeter-5.4.1/bin/jmeter /usr/local/bin/jmeter
