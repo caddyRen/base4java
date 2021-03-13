@@ -61,9 +61,9 @@ public class ChannelTest {
 //        test2(1000 * 1000 * 1024,
 //                "/home/caddy/Downloads/blackarch-linux-full-2020.12.01-x86_64.iso",
 //                "/disk/ssd/test/5.iso");
-        test2(480,
-                "/home/caddy/gcviewer.properties",
-                "/home/caddy/2gcviewer.properties");
+        test2(6000,
+                "/home/caddy/gc1.png",
+                "/home/caddy/gc1-1.png");
         System.out.println(System.currentTimeMillis() - start);
 //        test1();
     }
@@ -124,21 +124,28 @@ public class ChannelTest {
 
     }
 
-    //复制文件直接缓冲区
+    /**
+     * 复制文件直接缓冲区
+     * 直接在堆外内存（物理）修改，操作系统不需要再拷贝一次
+     * MappedByteBuffer
+     *
+     * mode 读写模式
+     * position 直接修改的其实位置
+     * size 映射内存的大小,最大值不能超过Integer.MAX_VALUE
+     * MappedByteBuffer map(MapMode mode,long position, long size)
+     *
+     * @param l
+     * @param path
+     * @param newFilePath
+     */
     public static void test2(long l,String path,String newFilePath) {
-        FileChannel fisChannel = null;//15G 15665485824
-        FileChannel fosChannel = null;
         MappedByteBuffer inmapbuf;
         MappedByteBuffer outmapbuf;
         int byteSize = (int) l;
         byte[] bytes = new byte[byteSize];
 //        long l=102400000l;//100M=100*1000*1024byte
-        try {
-            fisChannel = FileChannel.open(Paths.get(path), StandardOpenOption.READ);
-            //fisChannel = FileChannel.open(Paths.get(path), StandardOpenOption.READ);//7.1G 7554990080
-            //fisChannel = FileChannel.open(Paths.get(path), StandardOpenOption.READ);//3.3G
-            fosChannel = FileChannel.open(Paths.get(newFilePath), StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-
+        try (FileChannel fisChannel = FileChannel.open(Paths.get(path), StandardOpenOption.READ);
+             FileChannel fosChannel = FileChannel.open(Paths.get(newFilePath), StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE)){
             long filesize = fisChannel.size();//返回值单位为byte
 
             for (long i = 0; i < fisChannel.size(); i += l, filesize -= l) {
@@ -149,32 +156,56 @@ public class ChannelTest {
                     bytes = new byte[inmapbuf.limit()];
                 }
                 inmapbuf.get(bytes);
+                //会修改path文件，不会修改newFilePath
+                // 需要设置：
+                // FileChannel fisChannel = FileChannel.open(Paths.get(path), StandardOpenOption.READ,StandardOpenOption.WRITE);
+                // inmapbuf = fisChannel.map(FileChannel.MapMode.READ_WRITE, i, l);
+//                inmapbuf.put(1,(byte)'-');
                 outmapbuf.put(bytes);
+                //会修改newFilePath，不会修改path文件
+                outmapbuf.put(1,(byte)'-');
+
             }
 
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (fosChannel != null) {
-                    fosChannel.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (fisChannel != null) {
-                    fisChannel.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
 
     }
 
+    public static void test2plus(long l,String path,String newFilePath) {
+        MappedByteBuffer inmapbuf;
+        int byteSize = (int) l;
+        byte[] bytes = new byte[byteSize];
+        try (FileChannel fisChannel = FileChannel.open(Paths.get(path), StandardOpenOption.READ,StandardOpenOption.WRITE);
+             FileChannel fosChannel = FileChannel.open(Paths.get(newFilePath), StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE))
+        {
+            long filesize = fisChannel.size();//返回值单位为byte数
+            for (long i = 0; i < fisChannel.size(); i += l, filesize -= l) {
+                l = i + l > fisChannel.size() ? filesize : l;
+                inmapbuf = fisChannel.map(FileChannel.MapMode.READ_ONLY, i, l);
+                if (byteSize > inmapbuf.limit()) {
+                    bytes = new byte[inmapbuf.limit()];
+                }
+                inmapbuf.get(bytes);
+                //会修改path文件，会修改newFilePath
+                // 需要设置：
+                // FileChannel fisChannel = FileChannel.open(Paths.get(path), StandardOpenOption.READ,StandardOpenOption.WRITE);
+                // inmapbuf = fisChannel.map(FileChannel.MapMode.READ_WRITE, i, l);
 
+                //inmapbuf.put(1,(byte)'-');
+                inmapbuf.flip();
+                fosChannel.write(inmapbuf);
+                inmapbuf.clear();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
     //通道之间数据传输 直接缓冲区 15g 文件直接停电,可能是固态太热了，掉盘断电java
     public static void test3(String path,String newFilePath) throws IOException {
         FileChannel inChannel = FileChannel.open(Paths.get(path), StandardOpenOption.READ);
