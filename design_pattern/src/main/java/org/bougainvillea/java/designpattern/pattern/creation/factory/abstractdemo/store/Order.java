@@ -5,6 +5,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import static org.bougainvillea.java.designpattern.pattern.creation.factory.no.order.Order.getName;
 
+/**
+ * 建造者模式
+ * 中 指挥者角色
+ */
 public class Order {
 
     AbsFactory absFactory;

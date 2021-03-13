@@ -18,6 +18,20 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class SimpleFactory {
 
+    private static volatile SimpleFactory simpleFactory;
+
+    private SimpleFactory(){}
+    public static SimpleFactory getInstance(){
+        if(simpleFactory==null){
+           synchronized (SimpleFactory.class){
+               if(simpleFactory==null){
+                   simpleFactory=new SimpleFactory();
+               }
+           }
+        }
+        return simpleFactory;
+    }
+
     /**
      * @Description: 简单工厂模式getPizza
      * @Author caddy

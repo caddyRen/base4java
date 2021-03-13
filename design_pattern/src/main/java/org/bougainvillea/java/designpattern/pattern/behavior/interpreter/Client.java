@@ -42,7 +42,7 @@ public class Client {
         for(char ch:expStr.toCharArray()){
             if(ch!='+'&&ch!='-'){
                 if(!map.containsKey(String.valueOf(ch))){
-                    System.err.print("请输入"+String.valueOf(ch)+"的值:");
+                    System.err.print("请输入"+ ch +"的值:");
                     String in=(new BufferedReader(new InputStreamReader(System.in))).readLine();
                     map.put(String.valueOf(ch),Integer.valueOf(in));
                 }

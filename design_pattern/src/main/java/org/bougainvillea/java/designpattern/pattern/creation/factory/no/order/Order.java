@@ -4,6 +4,7 @@ import org.bougainvillea.java.designpattern.pattern.creation.factory.no.pizza.Ch
 import org.bougainvillea.java.designpattern.pattern.creation.factory.no.pizza.GreekPizza;
 import org.bougainvillea.java.designpattern.pattern.creation.factory.no.pizza.Pizza;
 import org.apache.commons.lang3.StringUtils;
+import org.bougainvillea.java.designpattern.pattern.creation.factory.simple.factory.SimpleFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,6 +19,24 @@ import java.io.InputStreamReader;
 public class Order {
 
     public static void main(String[] args) {
+
+        System.out.println("不使用工厂方法");
+        noFactory();
+
+        /**
+         * 简单工厂方法模式&单例模式
+         */
+        System.out.println("使用简单工厂");
+        SimpleFactory.getInstance().getPizza(getName());
+        System.out.println("使用静态工厂");
+        SimpleFactory.getPizza2(getName());
+
+    }
+
+    /**
+     * 不是用工厂方法生产Pizza
+     */
+    public static void noFactory(){
         Pizza pizza=null;
         String name="";
         do{
@@ -36,12 +55,14 @@ public class Order {
             pizza.cut();
             pizza.bake();
         }while (true);
-
     }
 
+    /**
+     * 输入交互方法
+     */
     public static String getName(){
         BufferedReader string=new BufferedReader(new InputStreamReader(System.in));
-        System.err.println("wait input...");
+        System.err.println("wait input... cheese or greek");
         String name= null;
         try {
             name = string.readLine();

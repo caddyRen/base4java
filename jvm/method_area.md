@@ -44,7 +44,7 @@ request, the Java Virtual Machine throws an OutOfMemoryError.
   Metaspace
     - 例子：加载大量的第三方jar包
     - Tomcat部署的工程过多（30-50个）
-    - 大量动态的生产反射类
+    - 大量动态的生成反射类
 - 关闭JVM就会释放这个方法区的内存
 
 ## [设置method area大小](JVMOptions.md)与[OOM](OOM.md)
@@ -77,7 +77,7 @@ request, the Java Virtual Machine throws an OutOfMemoryError.
             1. 域名称
             2. 域类型
             3. 域修饰符（public、private、protected、static、final、volatile、transient的某个子集）
-    - 静态常量（non-final static变量）：随着JDK变化，存储位置会变化
+    - 静态变量（non-final static变量）：随着JDK变化，存储位置会变化
         1. 静态变量和类关联在一起，随着类的加载而加载，他们称为类数据在逻辑上的一部分
         2. 类变量被类的所有实例共享，即使没有类实例也可以访问
     - 即时编译器JIT编译后的代码缓存
@@ -92,7 +92,7 @@ request, the Java Virtual Machine throws an OutOfMemoryError.
             每个异常处理的开始位置、结束位置、代码处理在Program Counter Register中的偏移地址、被捕获的异常类的常量池索引
             ```
     - static final全局常量
-        1. 被声明为final的类变量的处理方法不同每个全局常量在编译的时候就会被分配
+        1. 被声明为final的类变量的处理方法不同，每个全局常量在编译的时候就会被分配
     - runtime Constant pool运行时常量池
         - Constant Pool Table是Class文件的一部分，用于存放编译期生成的各种字面量与符号引用
         - Constant Pool Table在类加载后存放到Method Area的Runtime Constant Pool
@@ -174,7 +174,7 @@ and are accustomed to not configuring the permanent generation.
 JDK7中将StringTable放到heap中，因为PermGenSpace的回收效率很低，在FullGC的时候才会触发
 而FullGC是Old区空间不足、PermGenSpace不足时才会触发
 导致StringTable回收效率不高，而开发中会有大量的字符串被创建，回收效率低，导致PermGenSpace空间不足。
-放在heap区能即使回收内存
+放在heap区能即时回收内存
 ```
 ### 静态变量放在哪里
 - new出的实例对象都在heap区

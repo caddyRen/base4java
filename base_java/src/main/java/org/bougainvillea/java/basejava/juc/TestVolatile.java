@@ -1,5 +1,7 @@
 package org.bougainvillea.java.basejava.juc;
 
+import org.bougainvillea.java.basejava.codequality.chapter07.Do;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -183,4 +185,28 @@ class TestDemo5 implements Runnable{
         }
         System.out.println(i.getAndIncrement());
     }
+}
+
+/**
+ * 双重检查单例模式
+ */
+class DoubleCheck{
+
+    private DoubleCheck(){
+
+    }
+
+    private static volatile DoubleCheck doubleCheck;
+
+    public static DoubleCheck getInstance(){
+        if(doubleCheck==null){
+            synchronized (DoubleCheck.class){
+                if(doubleCheck==null){
+                    doubleCheck=new DoubleCheck();
+                }
+            }
+        }
+        return doubleCheck;
+    }
+
 }

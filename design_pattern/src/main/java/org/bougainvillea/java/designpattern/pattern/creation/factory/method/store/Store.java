@@ -6,6 +6,11 @@ import org.bougainvillea.java.designpattern.pattern.creation.factory.method.orde
 
 import static org.bougainvillea.java.designpattern.pattern.creation.factory.no.order.Order.getName;
 
+/**
+ * 工厂方法模式
+ * 定义抽象类，定义创建对象的抽象方法
+ * 由具体子类决定要实例化的对象
+ */
 public class Store {
 
     public static void main(String[] args) {

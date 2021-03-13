@@ -30,14 +30,15 @@
     13
     Virtual Machine stack for a new thread, the Java Virtual Machine throws an
     OutOfMemoryError
-    由于跨平台性的设计，java的指令都是根据栈来设计的，不同平台cpu架构不同，所以不能设计为基于寄存器的
+    由于跨平台性的设计，java的指令都是根据栈来设计的，不同平台cpu架构不同，所以不能基于寄存器来设计
     优点是跨平台，指令集小，编译器容易实现，缺点是性能下降，实现同样的功能需要更多的指令
   ```
-    - 栈是运行是的单位，而堆是存储的单位
+    - 栈是运行时的单位，而堆是存储的单位
     - 栈解决程序的运行问题，即程序如何执行
     - 堆解决数据存储问题，即数据怎么放，放到哪
-        - 局部变量，基本数据类型，引用类型的地址，在栈内
-        - 引用类型都在堆空间
+        - 局部变量和部分结果，8种基本数据类型、引用类型的地址。在stack内保存
+        - stack参与方法调用和返回
+        - new创建的对象实体都在堆空间
     - JVM stack 每个线程在创建时都会创建一个JVM stack,内部保存一个个stack frame,对应一次次的java方法调用
     - 生命周期与线程一致
     - 主管java程序的运行，保存方法的局部变量(8种基本数据类型、对象的引用地址)、部分结果。并参与方法的调用和返回
@@ -57,11 +58,11 @@
         - 一个方法的执行对应一个stack frame的入栈
         - 一个方法的结束对应一个stack frame的出栈
     - stack frame是一个内存区块，是一个数据集，维系着方法执行过程中的各种数据信息
-    - 在一条活动线程中，一个时间点上只会有一个活动的栈帧，即当前正在执行的方法的栈帧（栈顶栈帧）是有效的，这个栈帧成为当前栈帧（current frame）
+    - 在一条活动线程中，一个时间点上只会有一个活动的栈帧，即当前正在执行的方法的栈帧（栈顶栈帧）是有效的，这个栈帧称为当前栈帧（current frame）
     - 当前栈帧对应的方法是当前方法（current method）
     - 定义这个方法的类就是当前类（current class）
     - Execution Engine执行引擎运行的所有字节码指令只针对current frame进行操作
-    - 如果在该方法中调用了其他方法，对应的心的stack frame会被创建出来，放在栈顶，成为新的current frame
+    - 如果在该方法中调用了其他方法，对应的新的stack frame会被创建出来，放在栈顶，成为新的current frame
     - JAVA 方法两种返回函数方式，栈帧出栈
         - 正常函数返回使用return指令
         - 抛出异常（未用try-catch捕获处理）
@@ -133,7 +134,7 @@
     - JVM的解释引擎是基于operand stack的execution engine
     - operand stack主要保存计算过程的中间结果，同时作为计算过程中变量临时的存储空间
     - operand stack是JVM execution engine的一个工作区，当一个方法刚开始执行的时候，一个新的stack frame也会随之被创建，这个方法的operand stack是空的（已创建）
-    - 每一个operand stack 都会拥有一个明确的栈深度用于存储数值，其所需的最大深度在编译期就定义好了，保存在方法的Code属性中，为max_stack的值，与local variables大小
+    - 每一个operand stack 都会拥有一个明确的栈深度用于存储数值，其所需的最大深度在编译期就定义好了，保存在方法的Code属性中，为max_stack的值，与local variables大小无关
     - operand stack中任何一个元素都是任意的Java数据类型，与local variables的slot类似
         - 32bit的类型占用一个operand stack单位深度
         - 64bit的类型占用两个operand stack单位深度
@@ -232,7 +233,7 @@ Java中任何一个普通方法其实都具备虚函数的特征，相当于c++�
 ### 方法重写的本质
 
 1. 找到operand stack 栈顶元素所执行的对象的实际类型，记作c（当调用一个对象的方法时，会先把该方法的对象压入operand stack，通常为invokevirtual）
-2. 如果在类型c中找到与常量中
+2. 如果在类型c中找到与常量池中
    描述符、简单名称都相符的方法（查找c中有没有该方法），则进行访问权限校验，如果权限校验通过，则返回这个方法的直接引用，查找过程结束，如果访问权限校验不通过，则返回java.lang.IllegalAccessError异常
 3. 如果在类型c中没找到与常量中 描述符、简单名称都相符的方法（查找c中有没有该方法），按照继承关系从下往上依次对c的各个父类进行第二步的搜索和验证
 4. 如果始终没有找到合适的方法，则抛出java.lang.AbstractMethodError异常
@@ -249,7 +250,7 @@ Java中任何一个普通方法其实都具备虚函数的特征，相当于c++�
 ## return address
 
 - 存放调用该方法的Program Counter Register的值，即下一条指令的值
-- 无论通过哪种方式和退出，在方法退出后都返回到该方法被调用的位置
+- 无论通过哪种方式退出，在方法退出后都返回到该方法被调用的位置
     - 一个方法的结束，有两种方式
         - 正常退出时：
             - 调用者的PCRegister的值作为返回地址，即调用该方法的指令的下一条指令的地址

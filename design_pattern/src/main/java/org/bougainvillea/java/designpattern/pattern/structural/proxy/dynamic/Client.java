@@ -14,7 +14,7 @@ public class Client {
         ITeacherDao proxyInstance =(ITeacherDao) new ProxyFactory(target).getProxyInstance();
 
 
-        System.err.println(proxyInstance);
+        System.err.println(proxyInstance);//会调用Object.toString()方法，也被代理增强
         // class com.sun.proxy.$Proxy0  $Proxy0表示内存中动态生存代理对象
         System.err.println(proxyInstance.getClass());
         proxyInstance.teach();

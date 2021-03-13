@@ -2,7 +2,7 @@ package org.bougainvillea.java.designpattern.pattern.structural.decorator;
 
 
 /**
- * @Description: 装饰着
+ * @Description: 装饰者
  * @Author caddy
  * @date 2020-02-12 18:13:49
  * @version 1.0

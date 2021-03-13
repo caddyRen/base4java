@@ -1,54 +1,69 @@
 package org.bougainvillea.java.dsaa;
 
+/**
+ * 含有多个空格的ASCII串
+ * 求最长非空格字符串的长度，尽可能最优
+ *
+ * aa bc aaaa aaa==>4
+ */
 public class Test {
     public static void main(String[] args) {
-
-        System.out.println(17-16);
-        flag(13);
-        flag(15);
-        flag(17);
-        flag(7);
-        flag(5);
-        flag(3);
-        //16   13   6   8
-
-        //16  10000
-        //8   01000
-        //4   00100
-        //2   00010
-
-        //17  10001   -1   10010  10000  00001 1
-        //15  01111   +1   10000  01110  00111 7
-        //13  01101   -1   01110  01100  00101 5
-        //7   00111   +1   01000  00110  00011
-        //5   00101   -1   00110  00100  00001
-        //3   00011   -1   00100  00010  00001
-        //3   00011
+        String a="aa bc aaaa aaa";
+        String a1=" aa bc aaaa aaa";
+        String a2="aa bc aaaa aaa aaa    aaa aa   aaaaa";
+        String a3=" ";
+        String a33="   ";
+        String a4="";
+        String a5="aa bc  aaaa aaa  ";
+        String a6="aa bc   aaaa aaa";
+        System.out.println(getStrLengthPlus(a));
+        System.out.println(getStrLengthPlus(a1));
+        System.out.println(getStrLengthPlus(a2));
+        System.out.println(getStrLengthPlus(a3));
+        System.out.println(getStrLengthPlus(a33));
+        System.out.println(getStrLengthPlus(a4));
+        System.out.println(getStrLengthPlus(a5));
+        System.out.println(getStrLengthPlus(a6));
     }
 
-    public static boolean flag(int a){
-        String s = Integer.toString(a, 2);
-        int length=s.length();
-        double tmp_b=Math.pow(2,length-1);
-        int v = a - (int)tmp_b;
-        if((v&3)==3){
-            return true;
+    public static int getStrLength(String str){
+        int result=0;
+        int temp=0;
+        str.trim();
+        char[] chars = str.toCharArray();
+        for (char c:chars){
+          if(!Character.isSpaceChar(c)){
+              temp+=1;
+              if(result<temp){
+                  result=temp;
+              }
+          }else {
+              temp=0;
+          }
         }
-        return false;
+        return result;
     }
-
-
-    public static int getCandy(int a,int count){
-        //按位与运算判断是否为奇数
-        if((a&1)==1){
-            count++;
-            a+=1;
+    //减少循环次数
+    public static int getStrLengthPlus(String str){
+        int result=0;
+        int temp=0;
+        str.trim();
+        char[] chars = str.toCharArray();
+        //减少循环次数
+        for (int i=0;i<chars.length;i++){
+            if(!Character.isSpaceChar(chars[i])){
+                temp+=1;
+                if(result<temp){
+                    result=temp;
+                }
+            }else {
+                //最长字符串==剩余字符串可直接退出循环
+                if(result>=chars.length-1-i){
+                    break;
+                }
+                temp=0;
+            }
         }
-        a /= 2;
-        count++;
-        if(a!=1){
-            count=getCandy(a,count);
-        }
-        return count;
+        return result;
     }
 }

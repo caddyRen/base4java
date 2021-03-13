@@ -8,6 +8,8 @@ public class SingletonDemo {
             TestThread t = new TestThread();
             new Thread(t).start();
         }
+        Demo.INSTANCE.test();
+        System.out.println(Demo.INSTANCE.hashCode());
     }
 }
 
@@ -21,7 +23,7 @@ enum Demo{
     INSTANCE;
 
     public void test(){
-
+        System.out.println("enum");
     }
 }
 

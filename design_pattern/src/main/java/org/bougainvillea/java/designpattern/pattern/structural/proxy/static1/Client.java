@@ -4,8 +4,9 @@ public class Client {
 
     public static void main(String[] args) {
 
-        TeacherProxy teacherProxy=new TeacherProxy(new Teacher());
-        teacherProxy.teach();
+        ITeacherDao teacherDao=new TeacherProxy(new Teacher());
+        teacherDao.teach();
+
 
     }
 

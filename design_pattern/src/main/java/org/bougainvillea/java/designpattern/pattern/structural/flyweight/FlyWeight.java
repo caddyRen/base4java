@@ -46,7 +46,7 @@ class UnSharedConcreteFlyWeight{
 }
 
 /**
- * 从这个共厂获取元数据，即 ConcreteFlyWeight
+ * 从这个工厂获取元数据，即 ConcreteFlyWeight
  */
 class FlyWeightFactory{
     //存放共享内容的集合

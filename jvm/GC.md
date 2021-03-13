@@ -1,7 +1,7 @@
 # GC
 ```text
 GC是垃圾回收线程，与之对应的是用户线程
-收集垃圾时STW（Stop The Work），进行检索垃圾，会导致用户线程暂停，影响应用
+收集垃圾时STW（Stop The World），进行检索垃圾，会导致用户线程暂停，影响应用
 
 JVM在进行GC时，并非每次都对三个内存（新生代、老年代、方法区）区域一起回收，大部分时候回收指新生代
 
@@ -24,7 +24,7 @@ JVM在进行GC时，并非每次都对三个内存（新生代、老年代、方
 - 每次MinorGC会清理年轻代内存
 - MinorGC非常频繁
 - 回收速度快
-- 会引发STW（Stop The Work），暂停其他用户线程，等待垃圾回收结束，用户线程才恢复运行
+- 会引发STW（Stop The World），暂停其他用户线程，等待垃圾回收结束，用户线程才恢复运行
 ## Major GC 
 - 对象从Old区消失时，则发生了Major GC或Full GC
 - 出现MajorGC 经常会伴随至少一次的MinorGC（但非绝对，在Parallel Scavenge收集器的收集策略里直接进行MajorGC的策略选择过程）
