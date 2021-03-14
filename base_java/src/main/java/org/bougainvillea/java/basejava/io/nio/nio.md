@@ -1,5 +1,12 @@
 # NIO
 ## Selector
+- 当客户端连接时，会通过ServerSocketChannel得到SocketChannel
+- selector通过select方法监听，返回事件发生的通道个数
+- 将SocketChannel注册到Selector上，SelectionKey register(Selector sel, int ops),selector可以注册多个SocketChannel
+- 注册后返回一个SelectionKey会和该Selector关联（set集合）
+- 进而得到各个SelectionKey（有事件发生）
+- 再通过SelectionKey反向获取SocketChannel,channel()方法
+- 通过获取的SocketChannel进行业务处理
 ## Channel
 ## Buffer
 - 每个Channel对应一个或多个Buffer（分散读取和聚集写入）

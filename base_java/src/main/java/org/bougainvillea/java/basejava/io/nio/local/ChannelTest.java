@@ -186,7 +186,7 @@ public class ChannelTest {
                 l = i + l > fisChannel.size() ? filesize : l;
                 inmapbuf = fisChannel.map(FileChannel.MapMode.READ_ONLY, i, l);
                 if (byteSize > inmapbuf.limit()) {
-                    bytes = new byte[inmapbuf.limit()];
+                 bytes = new byte[inmapbuf.limit()];
                 }
                 inmapbuf.get(bytes);
                 //会修改path文件，会修改newFilePath
